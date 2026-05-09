@@ -17,8 +17,6 @@
     --accent2: #3effc8;
     --text: #f0f0f2;
     --muted: #6b6b72;
-    --bubble-out: #7fff6a;
-    --bubble-in: #1e1e21;
     --radius: 18px;
   }
 
@@ -162,22 +160,6 @@
   }
 
   .btn-ghost:hover { border-color: var(--text); color: var(--text); }
-
-  .number-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--surface2);
-    border: 1px solid var(--accent);
-    border-radius: 100px;
-    padding: 8px 16px;
-    font-family: 'DM Mono', monospace;
-    font-size: 20px;
-    font-weight: 500;
-    color: var(--accent);
-    letter-spacing: 3px;
-    margin-bottom: 24px;
-  }
 
   .error-msg {
     color: #ff6b6b;
@@ -358,8 +340,6 @@
   .chat-messages::-webkit-scrollbar { width: 4px; }
   .chat-messages::-webkit-scrollbar-track { background: transparent; }
   .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  .msg-group { display: flex; flex-direction: column; gap: 4px; }
 
   .msg-row {
     display: flex;
@@ -857,7 +837,7 @@
     authDomain: "pockettext-1a2bd.firebaseapp.com",
     databaseURL: "https://pockettext-1a2bd-default-rtdb.firebaseio.com",
     projectId: "pockettext-1a2bd",
-    storageBucket: "pockettext-1a2bd.firebasestorage.app",
+    storageBucket: "pockettext-1a2bd.appspot.com",
     messagingSenderId: "46478191144",
     appId: "1:46478191144:web:3483717ba1aa78ca4c231d",
     measurementId: "G-40PRTD6Y56"
@@ -937,10 +917,6 @@
     return escapeHtml(str).replace(/`/g, '&#96;');
   }
 
-  function isProbablyUrl(text) {
-    return /https?:\/\/[^\s]+/i.test(text || '');
-  }
-
   function extractFirstUrl(text) {
     if (!text) return null;
     const match = text.match(/https?:\/\/[^\s<>"')\]]+/i);
@@ -954,9 +930,40 @@
     return safe.replace(urlRegex, (raw) => {
       const clean = raw.replace(/[.,!?;:]+$/g, '');
       const trailing = raw.slice(clean.length);
-      const url = clean;
-      return `<a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer" class="message-link">${escapeHtml(url)}</a>${escapeHtml(trailing)}`;
+      return `<a href="${escapeAttr(clean)}" target="_blank" rel="noopener noreferrer" class="message-link">${escapeHtml(clean)}</a>${escapeHtml(trailing)}`;
     });
+  }
+
+  function safeHost(url) {
+    try {
+      return new URL(url).hostname.replace(/^www\./, '');
+    } catch {
+      return url;
+    }
+  }
+
+  async function fetchLinkPreview(url) {
+    try {
+      const endpoint = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
+      const res = await fetch(endpoint, { method: 'GET' });
+      const json = await res.json();
+      const data = json?.data || {};
+      return {
+        url,
+        title: data.title || safeHost(url),
+        description: data.description || '',
+        image: data.image?.url || data.image || '',
+        siteName: data.publisher || data.siteName || safeHost(url)
+      };
+    } catch {
+      return {
+        url,
+        title: safeHost(url),
+        description: '',
+        image: '',
+        siteName: safeHost(url)
+      };
+    }
   }
 
   function renderLinkPreview(preview) {
@@ -975,38 +982,6 @@
         </div>
       </div>
     `;
-  }
-
-  function safeHost(url) {
-    try {
-      return new URL(url).hostname.replace(/^www\./, '');
-    } catch {
-      return url;
-    }
-  }
-
-  async function fetchLinkPreview(url) {
-    try {
-      const endpoint = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
-      const res = await fetch(endpoint);
-      const json = await res.json();
-      const data = json?.data || {};
-      return {
-        url,
-        title: data.title || safeHost(url),
-        description: data.description || '',
-        image: data.image?.url || data.image || '',
-        siteName: data.publisher || data.siteName || safeHost(url)
-      };
-    } catch (e) {
-      return {
-        url,
-        title: safeHost(url),
-        description: '',
-        image: '',
-        siteName: safeHost(url)
-      };
-    }
   }
 
   function clearAttachment() {
@@ -1049,7 +1024,7 @@
     const file = e.target.files && e.target.files[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      showToast('Please choose an image file.');
+      showToast('please choose an image file.');
       return;
     }
     selectedImageFile = file;
@@ -1113,9 +1088,7 @@
   async function loadContacts() {
     const snap = await get(dbRef(db, `contacts/${currentUser.username}`));
     contacts = {};
-    if (snap.exists()) {
-      contacts = snap.val();
-    }
+    if (snap.exists()) contacts = snap.val();
     renderSidebar();
   }
 
@@ -1126,12 +1099,10 @@
 
       Object.entries(all).forEach(([cid, msgs]) => {
         if (!cid.includes(currentUser.number)) return;
-
         let unread = 0;
         Object.values(msgs).forEach(m => {
           if (m.from !== currentUser.number && !m.read) unread++;
         });
-
         const otherNum = cid.split('_').find(n => n !== currentUser.number);
         unreadCounts[otherNum] = unread;
       });
@@ -1319,7 +1290,13 @@
 
     let imageUrl = null;
     if (selectedImageFile) {
-      imageUrl = await uploadSelectedImage(cid);
+      try {
+        imageUrl = await uploadSelectedImage(cid);
+      } catch (err) {
+        console.error(err);
+        showToast('image upload failed.');
+        return;
+      }
     }
 
     const message = {
@@ -1386,6 +1363,11 @@
     $('login-card').style.display = 'block';
   };
 
+  document.addEventListener('click', (e) => {
+    const modal = $('add-contact-modal');
+    if (e.target === modal) closeModal();
+  });
+
   const saved = localStorage.getItem('pt_user');
   if (saved) {
     try {
@@ -1394,10 +1376,12 @@
         if (snap.exists()) {
           currentUser = snap.val();
           localStorage.setItem('pt_user', JSON.stringify(currentUser));
+        } else {
+          localStorage.removeItem('pt_user');
         }
         showApp();
       });
-    } catch (e) {
+    } catch {
       localStorage.removeItem('pt_user');
     }
   }
