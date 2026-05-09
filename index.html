@@ -16,47 +16,60 @@
       /* ==================== MOBILE AUTH FIXES ==================== */
       @media (max-width: 640px) {
         body,
-        #auth-screen {
-          height: 100dvh; /* better than 100vh on mobile */
+        #auth-screen,
+        .screen {
+          height: 100dvh !important;
+          min-height: 100dvh !important;
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
         }
 
         .auth-card {
           width: 100%;
           max-width: 92vw;
-          padding: 36px 24px;
+          padding: 40px 24px;
           border-radius: 20px;
           margin: 20px 16px;
+          position: relative;
+          z-index: 10;
         }
 
         .auth-title {
           font-size: 24px;
         }
-
         .auth-sub {
           font-size: 13.5px;
-        }
-
-        label {
-          font-size: 12px;
         }
 
         input[type="text"],
         input[type="password"],
         textarea {
-          font-size: 16px !important; /* ← This is the key */
-          padding: 14px 16px;
+          font-size: 16px !important;
+          padding: 16px 16px !important;
+          margin-bottom: 20px;
         }
 
         .btn {
-          padding: 16px 20px;
-          font-size: 16.5px;
-          min-height: 52px; /* better tap target */
+          padding: 18px 20px !important;
+          font-size: 17px !important;
+          min-height: 58px;
+          margin-top: 8px;
+          position: relative;
+          z-index: 20;
         }
 
         .btn-ghost {
-          padding: 14px 20px;
+          padding: 16px 20px !important;
+        }
+
+        /* Force better touch handling */
+        button,
+        .btn {
+          -webkit-tap-highlight-color: rgba(78, 165, 255, 0.3);
         }
       }
+
+      /* ==================== GLOBAL STYLES ==================== */
 
       :root {
         --bg: #08111f;
