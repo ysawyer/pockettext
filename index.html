@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>PocketText</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -34,11 +34,9 @@
     overflow: hidden;
   }
 
-  /* ─── SCREENS ─── */
   .screen { display: none; flex-direction: column; height: 100vh; }
   .screen.active { display: flex; }
 
-  /* ─── AUTH SCREEN ─── */
   #auth-screen {
     align-items: center;
     justify-content: center;
@@ -188,10 +186,8 @@
     min-height: 18px;
   }
 
-  /* ─── MAIN APP ─── */
   #app-screen { flex-direction: row; }
 
-  /* ─── SIDEBAR ─── */
   .sidebar {
     width: 300px;
     min-width: 300px;
@@ -329,7 +325,6 @@
     border-color: var(--accent);
   }
 
-  /* ─── CHAT PANEL ─── */
   .chat-panel {
     flex: 1;
     display: flex;
@@ -383,6 +378,7 @@
     line-height: 1.5;
     word-break: break-word;
     max-width: 100%;
+    overflow: hidden;
   }
 
   .outgoing .bubble {
@@ -406,40 +402,127 @@
     margin-bottom: 2px;
   }
 
-  .chat-input-area {
-    padding: 16px 24px;
+  .chat-input-stack {
     border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .attachment-preview {
+    padding: 12px 24px 0;
+  }
+
+  .attachment-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 10px 12px;
+    max-width: 100%;
+  }
+
+  .attachment-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .attachment-meta {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .attachment-name {
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .attachment-sub {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .attachment-remove {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    padding: 0 4px;
+  }
+
+  .chat-input-area {
+    padding: 16px 24px 18px;
     display: flex;
     gap: 12px;
     align-items: flex-end;
     background: var(--surface);
   }
 
-  .chat-input {
+  .chat-input-wrap {
     flex: 1;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
     background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 12px 16px;
+    padding: 10px 12px;
+  }
+
+  .attach-btn {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  .attach-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .chat-input {
+    flex: 1;
+    background: transparent;
+    border: none;
     color: var(--text);
     font-family: 'Syne', sans-serif;
     font-size: 14px;
     outline: none;
     resize: none;
     max-height: 120px;
-    transition: border-color 0.2s;
     line-height: 1.5;
+    padding: 6px 4px;
   }
 
-  .chat-input:focus { border-color: var(--accent); }
-
   .send-btn {
-    width: 46px; height: 46px;
+    width: 46px;
+    height: 46px;
     background: var(--accent);
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: all 0.15s;
     flex-shrink: 0;
   }
@@ -448,7 +531,6 @@
   .send-btn:active { transform: scale(0.97); }
   .send-btn svg { color: #0d0d0f; }
 
-  /* ─── EMPTY STATE ─── */
   .empty-state {
     flex: 1;
     display: flex;
@@ -465,7 +547,6 @@
   .empty-title { font-size: 18px; font-weight: 700; color: var(--text); }
   .empty-sub { font-size: 14px; max-width: 280px; }
 
-  /* ─── MODAL ─── */
   .modal-overlay {
     display: none;
     position: fixed; inset: 0;
@@ -498,11 +579,9 @@
     font-size: 13px;
   }
 
-  /* ─── SCROLLBAR ─── */
   .sidebar-content::-webkit-scrollbar { width: 4px; }
   .sidebar-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  /* ─── TOAST ─── */
   .toast {
     position: fixed;
     bottom: 24px;
@@ -521,7 +600,118 @@
 
   .toast.show { transform: translateX(-50%) translateY(0); }
 
-  /* ─── RESPONSIVE ─── */
+  .date-divider {
+    display: flex; align-items: center; gap: 12px;
+    color: var(--muted); font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    margin: 8px 0;
+  }
+
+  .date-divider::before, .date-divider::after {
+    content: ''; flex: 1;
+    border-top: 1px solid var(--border);
+  }
+
+  .online-dot {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .message-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .message-link {
+    color: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    background: rgba(127, 255, 106, 0.16);
+    border: 1px solid rgba(127, 255, 106, 0.3);
+    border-radius: 10px;
+    padding: 0 6px;
+    display: inline-block;
+  }
+
+  .incoming .message-link {
+    color: var(--accent);
+    background: rgba(127, 255, 106, 0.08);
+  }
+
+  .link-preview {
+    margin-top: 10px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(0,0,0,0.08);
+    max-width: 100%;
+  }
+
+  .incoming .link-preview {
+    background: var(--bg);
+    border-color: var(--border);
+  }
+
+  .link-preview-image {
+    width: 100%;
+    max-height: 180px;
+    object-fit: cover;
+    display: block;
+    background: #0b0b0b;
+  }
+
+  .link-preview-body {
+    padding: 12px;
+  }
+
+  .link-preview-domain {
+    font-size: 11px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-bottom: 4px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .link-preview-title {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 4px;
+  }
+
+  .link-preview-desc {
+    font-size: 12px;
+    line-height: 1.4;
+    opacity: 0.9;
+  }
+
+  .image-message {
+    display: block;
+    width: 100%;
+    border-radius: 14px;
+    max-width: 320px;
+    max-height: 360px;
+    object-fit: cover;
+    background: #0b0b0b;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .incoming .image-message {
+    border-color: var(--border);
+  }
+
+  .caption-spacer {
+    height: 8px;
+  }
+
   @media (max-width: 640px) {
     .sidebar { width: 100%; min-width: unset; }
     #app-screen { flex-direction: column; }
@@ -529,35 +719,10 @@
     .chat-panel.mobile-open { display: flex; position: fixed; inset: 0; z-index: 50; }
     .sidebar.mobile-hidden { display: none; }
   }
-
-  /* ─── DIVIDER ─── */
-  .date-divider {
-    display: flex; align-items: center; gap: 12px;
-    color: var(--muted); font-size: 11px;
-    font-family: 'DM Mono', monospace;
-    margin: 8px 0;
-  }
-  .date-divider::before, .date-divider::after {
-    content: ''; flex: 1;
-    border-top: 1px solid var(--border);
-  }
-
-  /* ONLINE DOT */
-  .online-dot {
-    width: 8px; height: 8px;
-    background: var(--accent);
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
 </style>
 </head>
 <body>
 
-<!-- ═══════════════ AUTH SCREEN ═══════════════ -->
 <div id="auth-screen" class="screen active">
   <div class="grid-bg"></div>
   <div class="auth-card" id="login-card">
@@ -595,9 +760,7 @@
   </div>
 </div>
 
-<!-- ═══════════════ APP SCREEN ═══════════════ -->
 <div id="app-screen" class="screen">
-  <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div>
@@ -615,13 +778,13 @@
     </div>
   </div>
 
-  <!-- Chat Panel -->
   <div class="chat-panel" id="chat-panel">
     <div class="empty-state" id="empty-state">
       <div class="empty-icon">💬</div>
       <div class="empty-title">No chat selected</div>
       <div class="empty-sub">Pick a contact from the sidebar to start texting</div>
     </div>
+
     <div id="active-chat" style="display:none;flex-direction:column;height:100%;">
       <div class="chat-header">
         <div class="avatar" id="chat-avatar">?</div>
@@ -631,22 +794,35 @@
         </div>
         <div class="online-dot" title="Realtime"></div>
       </div>
+
       <div class="chat-messages" id="chat-messages"></div>
-      <div class="chat-input-area">
-        <textarea class="chat-input" id="message-input" placeholder="Type a message…" rows="1"
-          onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-        <button class="send-btn" onclick="sendMessage()">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-            <line x1="22" y1="2" x2="11" y2="13"></line>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-          </svg>
-        </button>
+
+      <div class="chat-input-stack">
+        <div class="attachment-preview" id="attachment-preview" style="display:none;"></div>
+        <div class="chat-input-area">
+          <div class="chat-input-wrap">
+            <button class="attach-btn" onclick="openImagePicker()" title="Attach image" type="button">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6.5"></path>
+                <path d="M17 3h4v4"></path>
+                <path d="M16 8 5 19"></path>
+              </svg>
+            </button>
+            <textarea class="chat-input" id="message-input" placeholder="Type a message…" rows="1"
+              onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          </div>
+          <button class="send-btn" onclick="sendMessage()">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ ADD CONTACT MODAL ═══════════════ -->
 <div class="modal-overlay" id="add-contact-modal">
   <div class="modal">
     <h3>Add Contact</h3>
@@ -663,19 +839,19 @@
   </div>
 </div>
 
-<!-- TOAST -->
+<input type="file" id="image-input" accept="image/*" hidden />
+
 <div class="toast" id="toast"></div>
 
-<!-- ═══════════════ FIREBASE ═══════════════ -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import {
-    getDatabase, ref, set, get, push, onValue, serverTimestamp, query, orderByChild
+    getDatabase, ref as dbRef, set, get, push, onValue, update
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import {
+    getStorage, ref as storageRef, uploadBytes, getDownloadURL
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-  // ┌──────────────────────────────────────────────────────┐
-  // │  🔧 PASTE YOUR FIREBASE CONFIG HERE                  │
-  // └──────────────────────────────────────────────────────┘
   const firebaseConfig = {
     apiKey: "AIzaSyD3zWKNZ4HIyw1rdt2w0iX4sT8J0FpDugg",
     authDomain: "pockettext-1a2bd.firebaseapp.com",
@@ -686,20 +862,20 @@
     appId: "1:46478191144:web:3483717ba1aa78ca4c231d",
     measurementId: "G-40PRTD6Y56"
   };
-  // ──────────────────────────────────────────────────────
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
+  const storage = getStorage(app);
 
-  // ── State ──
-  let currentUser = null; // { username, name, number, passwordHash }
-  let contacts = {};      // { number: { name, number, nickname } }
-  let activeConvo = null; // contact number
+  let currentUser = null;
+  let contacts = {};
+  let activeConvo = null;
   let activeTab = 'chats';
   let convoListeners = {};
   let unreadCounts = {};
+  let selectedImageFile = null;
+  let selectedImagePreviewUrl = null;
 
-  // ── Helpers ──
   const $ = id => document.getElementById(id);
 
   function showToast(msg) {
@@ -710,7 +886,6 @@
   }
 
   function hashPassword(pw) {
-    // Simple hash — for production use bcrypt via Cloud Functions
     let h = 0;
     for (let i = 0; i < pw.length; i++) {
       h = (Math.imul(31, h) + pw.charCodeAt(i)) | 0;
@@ -736,10 +911,9 @@
     return (name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
   }
 
-  // ── Generate unique 4-digit number ──
   async function assignNumber() {
     const taken = new Set();
-    const snap = await get(ref(db, 'users'));
+    const snap = await get(dbRef(db, 'users'));
     if (snap.exists()) {
       Object.values(snap.val()).forEach(u => taken.add(u.number));
     }
@@ -750,7 +924,138 @@
     return num;
   }
 
-  // ── Register ──
+  function escapeHtml(str = '') {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function escapeAttr(str = '') {
+    return escapeHtml(str).replace(/`/g, '&#96;');
+  }
+
+  function isProbablyUrl(text) {
+    return /https?:\/\/[^\s]+/i.test(text || '');
+  }
+
+  function extractFirstUrl(text) {
+    if (!text) return null;
+    const match = text.match(/https?:\/\/[^\s<>"')\]]+/i);
+    if (!match) return null;
+    return match[0].replace(/[.,!?;:]+$/g, '');
+  }
+
+  function renderTextWithLinks(text) {
+    const safe = escapeHtml(text || '');
+    const urlRegex = /(https?:\/\/[^\s<>"')\]]+)/gi;
+    return safe.replace(urlRegex, (raw) => {
+      const clean = raw.replace(/[.,!?;:]+$/g, '');
+      const trailing = raw.slice(clean.length);
+      const url = clean;
+      return `<a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer" class="message-link">${escapeHtml(url)}</a>${escapeHtml(trailing)}`;
+    });
+  }
+
+  function renderLinkPreview(preview) {
+    if (!preview || !preview.url) return '';
+    const title = escapeHtml(preview.title || preview.url);
+    const desc = escapeHtml(preview.description || '');
+    const site = escapeHtml(preview.siteName || safeHost(preview.url));
+    const img = preview.image ? `<img src="${escapeAttr(preview.image)}" alt="" class="link-preview-image">` : '';
+    return `
+      <div class="link-preview">
+        ${img}
+        <div class="link-preview-body">
+          <div class="link-preview-domain">${site}</div>
+          <div class="link-preview-title">${title}</div>
+          ${desc ? `<div class="link-preview-desc">${desc}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  function safeHost(url) {
+    try {
+      return new URL(url).hostname.replace(/^www\./, '');
+    } catch {
+      return url;
+    }
+  }
+
+  async function fetchLinkPreview(url) {
+    try {
+      const endpoint = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
+      const res = await fetch(endpoint);
+      const json = await res.json();
+      const data = json?.data || {};
+      return {
+        url,
+        title: data.title || safeHost(url),
+        description: data.description || '',
+        image: data.image?.url || data.image || '',
+        siteName: data.publisher || data.siteName || safeHost(url)
+      };
+    } catch (e) {
+      return {
+        url,
+        title: safeHost(url),
+        description: '',
+        image: '',
+        siteName: safeHost(url)
+      };
+    }
+  }
+
+  function clearAttachment() {
+    selectedImageFile = null;
+    if (selectedImagePreviewUrl) {
+      URL.revokeObjectURL(selectedImagePreviewUrl);
+      selectedImagePreviewUrl = null;
+    }
+    $('image-input').value = '';
+    $('attachment-preview').style.display = 'none';
+    $('attachment-preview').innerHTML = '';
+  }
+
+  function showAttachmentPreview(file) {
+    const holder = $('attachment-preview');
+    holder.style.display = 'block';
+    const objectUrl = URL.createObjectURL(file);
+    selectedImagePreviewUrl = objectUrl;
+    holder.innerHTML = `
+      <div class="attachment-chip">
+        <img src="${escapeAttr(objectUrl)}" class="attachment-thumb" alt="selected image">
+        <div class="attachment-meta">
+          <div class="attachment-name">${escapeHtml(file.name)}</div>
+          <div class="attachment-sub">${escapeHtml(Math.round(file.size / 1024))} KB</div>
+        </div>
+        <button class="attachment-remove" type="button" onclick="removeSelectedImage()">×</button>
+      </div>
+    `;
+  }
+
+  window.removeSelectedImage = function() {
+    clearAttachment();
+  };
+
+  window.openImagePicker = function() {
+    $('image-input').click();
+  };
+
+  $('image-input').addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      showToast('Please choose an image file.');
+      return;
+    }
+    selectedImageFile = file;
+    showAttachmentPreview(file);
+  });
+
   window.registerUser = async function() {
     const username = $('reg-username').value.trim().toLowerCase();
     const name = $('reg-name').value.trim();
@@ -763,18 +1068,16 @@
 
     errEl.textContent = '';
 
-    // Check username taken
-    const snap = await get(ref(db, `users/${username}`));
+    const snap = await get(dbRef(db, `users/${username}`));
     if (snap.exists()) { errEl.textContent = 'Username already taken.'; return; }
 
     const number = await assignNumber();
     const userData = { username, name, number, passwordHash: hashPassword(password) };
 
-    await set(ref(db, `users/${username}`), userData);
+    await set(dbRef(db, `users/${username}`), userData);
     await loginSuccess(userData);
   };
 
-  // ── Login ──
   window.loginUser = async function() {
     const username = $('login-username').value.trim().toLowerCase();
     const password = $('login-password').value;
@@ -783,7 +1086,7 @@
     if (!username || !password) { errEl.textContent = 'Enter username & password.'; return; }
     errEl.textContent = '';
 
-    const snap = await get(ref(db, `users/${username}`));
+    const snap = await get(dbRef(db, `users/${username}`));
     if (!snap.exists()) { errEl.textContent = 'User not found.'; return; }
 
     const data = snap.val();
@@ -798,7 +1101,6 @@
     showApp();
   }
 
-  // ── Show app ──
   function showApp() {
     $('auth-screen').classList.remove('active');
     $('app-screen').classList.add('active');
@@ -808,9 +1110,8 @@
     listenForIncoming();
   }
 
-  // ── Load contacts ──
   async function loadContacts() {
-    const snap = await get(ref(db, `contacts/${currentUser.username}`));
+    const snap = await get(dbRef(db, `contacts/${currentUser.username}`));
     contacts = {};
     if (snap.exists()) {
       contacts = snap.val();
@@ -818,32 +1119,31 @@
     renderSidebar();
   }
 
-  // ── Listen for incoming messages (any convo) ──
   function listenForIncoming() {
-    // Listen on all convos involving this user
-    onValue(ref(db, 'convos'), (snap) => {
+    onValue(dbRef(db, 'convos'), (snap) => {
       if (!snap.exists()) return;
       const all = snap.val();
+
       Object.entries(all).forEach(([cid, msgs]) => {
         if (!cid.includes(currentUser.number)) return;
-        // Count unreads: messages from others not read
+
         let unread = 0;
         Object.values(msgs).forEach(m => {
           if (m.from !== currentUser.number && !m.read) unread++;
         });
+
         const otherNum = cid.split('_').find(n => n !== currentUser.number);
         unreadCounts[otherNum] = unread;
       });
+
       renderSidebar();
     });
   }
 
-  // ── Render sidebar ──
   function renderSidebar() {
     const el = $('sidebar-content');
 
     if (activeTab === 'chats') {
-      // Show contacts that have conversations
       const contactList = Object.values(contacts);
       if (contactList.length === 0) {
         el.innerHTML = `<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">No contacts yet.<br>Add someone to start texting!</div>`;
@@ -855,8 +1155,8 @@
             <div class="contact-item ${activeConvo === c.number ? 'active' : ''}" onclick="openChat('${c.number}')">
               <div class="avatar">${getInitials(displayName)}</div>
               <div class="contact-info">
-                <div class="contact-name">${displayName}</div>
-                <div class="contact-preview">#${c.number}</div>
+                <div class="contact-name">${escapeHtml(displayName)}</div>
+                <div class="contact-preview">#${escapeHtml(c.number)}</div>
               </div>
               ${unread > 0 ? `<div class="unread-badge">${unread}</div>` : ''}
             </div>`;
@@ -864,7 +1164,6 @@
       }
       el.innerHTML += `<button class="add-contact-btn" onclick="openAddContact()">+ Add Contact</button>`;
     } else {
-      // Contacts tab
       const contactList = Object.values(contacts);
       if (contactList.length === 0) {
         el.innerHTML = `<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">No contacts yet.</div>`;
@@ -875,8 +1174,8 @@
             <div class="contact-item" onclick="openChat('${c.number}')">
               <div class="avatar">${getInitials(displayName)}</div>
               <div class="contact-info">
-                <div class="contact-name">${displayName}</div>
-                <div class="contact-num">#${c.number}</div>
+                <div class="contact-name">${escapeHtml(displayName)}</div>
+                <div class="contact-num">#${escapeHtml(c.number)}</div>
               </div>
             </div>`;
         }).join('');
@@ -885,7 +1184,6 @@
     }
   }
 
-  // ── Add contact ──
   window.addContact = async function() {
     const num = $('contact-number').value.trim();
     const nick = $('contact-nickname').value.trim();
@@ -894,23 +1192,24 @@
     if (num.length !== 4) { errEl.textContent = 'Enter a valid 4-digit number.'; return; }
     if (num === currentUser.number) { errEl.textContent = "That's your own number!"; return; }
 
-    // Find user by number
-    const snap = await get(ref(db, 'users'));
+    const snap = await get(dbRef(db, 'users'));
     if (!snap.exists()) { errEl.textContent = 'No users found.'; return; }
+
     let found = null;
-    Object.values(snap.val()).forEach(u => { if (u.number === num) found = u; });
+    Object.values(snap.val()).forEach(u => {
+      if (u.number === num) found = u;
+    });
+
     if (!found) { errEl.textContent = 'No user with that number.'; return; }
 
-    // Save contact
     contacts[num] = { number: num, name: found.name, nickname: nick || '' };
-    await set(ref(db, `contacts/${currentUser.username}/${num}`), contacts[num]);
+    await set(dbRef(db, `contacts/${currentUser.username}/${num}`), contacts[num]);
 
     closeModal();
     showToast(`${nick || found.name} added!`);
     renderSidebar();
   };
 
-  // ── Open chat ──
   window.openChat = async function(num) {
     activeConvo = num;
     const contact = contacts[num];
@@ -925,33 +1224,29 @@
 
     renderSidebar();
 
-    // Remove old listener
     if (convoListeners[num]) convoListeners[num]();
 
     const cid = convoId(currentUser.number, num);
 
-    // Real-time messages
-    convoListeners[num] = onValue(ref(db, `convos/${cid}`), async (snap) => {
+    convoListeners[num] = onValue(dbRef(db, `convos/${cid}`), async (snap) => {
       const msgs = snap.exists() ? snap.val() : {};
       renderMessages(msgs);
 
-      // Mark as read
       const updates = {};
       Object.entries(msgs).forEach(([k, m]) => {
         if (m.from !== currentUser.number && !m.read) {
           updates[`convos/${cid}/${k}/read`] = true;
         }
       });
+
       if (Object.keys(updates).length > 0) {
-        const { update } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
-        await update(ref(db), updates);
+        await update(dbRef(db), updates);
         unreadCounts[num] = 0;
         renderSidebar();
       }
     });
   };
 
-  // ── Render messages ──
   function renderMessages(msgs) {
     const el = $('chat-messages');
     const sorted = Object.values(msgs).sort((a, b) => (a.ts || 0) - (b.ts || 0));
@@ -966,37 +1261,91 @@
         lastDate = dateKey;
         const label = dateKey === new Date().toDateString() ? 'Today' :
           d.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
-        divider = `<div class="date-divider">${label}</div>`;
+        divider = `<div class="date-divider">${escapeHtml(label)}</div>`;
       }
+
+      let contentHtml = '';
+
+      if (m.type === 'image' && m.imageUrl) {
+        contentHtml += `<img src="${escapeAttr(m.imageUrl)}" alt="sent image" class="image-message">`;
+        if (m.caption) {
+          contentHtml += `<div class="caption-spacer"></div><div class="message-text">${renderTextWithLinks(m.caption)}</div>`;
+        }
+      } else {
+        if (m.text) {
+          contentHtml += `<div class="message-text">${renderTextWithLinks(m.text)}</div>`;
+        }
+      }
+
+      if (m.linkPreview && m.linkPreview.url) {
+        contentHtml += renderLinkPreview(m.linkPreview);
+      }
+
       return `${divider}
         <div class="msg-row ${out ? 'outgoing' : 'incoming'}">
-          <div class="bubble">${escapeHtml(m.text)}</div>
-          <div class="msg-time">${timeStr(m.ts)}</div>
+          <div class="bubble">${contentHtml || '&nbsp;'}</div>
+          <div class="msg-time">${escapeHtml(timeStr(m.ts))}</div>
         </div>`;
     }).join('');
 
     el.scrollTop = el.scrollHeight;
   }
 
-  // ── Send message ──
+  async function uploadSelectedImage(cid) {
+    if (!selectedImageFile) return null;
+
+    const safeName = selectedImageFile.name.replace(/[^\w.\-]+/g, '_');
+    const path = `chatImages/${cid}/${Date.now()}_${safeName}`;
+    const fileRef = storageRef(storage, path);
+
+    await uploadBytes(fileRef, selectedImageFile);
+    return await getDownloadURL(fileRef);
+  }
+
   window.sendMessage = async function() {
     const input = $('message-input');
     const text = input.value.trim();
-    if (!text || !activeConvo) return;
+
+    if (!activeConvo && !selectedImageFile) return;
+    if (!text && !selectedImageFile) return;
 
     const cid = convoId(currentUser.number, activeConvo);
-    await push(ref(db, `convos/${cid}`), {
+
+    let linkPreview = null;
+    const firstUrl = extractFirstUrl(text);
+    if (firstUrl) {
+      linkPreview = await fetchLinkPreview(firstUrl);
+    }
+
+    let imageUrl = null;
+    if (selectedImageFile) {
+      imageUrl = await uploadSelectedImage(cid);
+    }
+
+    const message = {
       from: currentUser.number,
-      text,
       ts: Date.now(),
       read: false
-    });
+    };
+
+    if (imageUrl) {
+      message.type = 'image';
+      message.imageUrl = imageUrl;
+      if (text) message.caption = text;
+      if (linkPreview) message.linkPreview = linkPreview;
+    } else {
+      message.type = 'text';
+      message.text = text;
+      if (linkPreview) message.linkPreview = linkPreview;
+    }
+
+    await push(dbRef(db, `convos/${cid}`), message);
 
     input.value = '';
     input.style.height = 'auto';
+    clearAttachment();
   };
 
-  // ── Utility ──
   window.handleKey = function(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -1037,24 +1386,18 @@
     $('login-card').style.display = 'block';
   };
 
-  function escapeHtml(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-
-  // ── Auto-login from localStorage ──
   const saved = localStorage.getItem('pt_user');
   if (saved) {
     try {
       currentUser = JSON.parse(saved);
-      // Refresh from DB in case anything changed
-      get(ref(db, `users/${currentUser.username}`)).then(snap => {
+      get(dbRef(db, `users/${currentUser.username}`)).then(snap => {
         if (snap.exists()) {
           currentUser = snap.val();
           localStorage.setItem('pt_user', JSON.stringify(currentUser));
         }
         showApp();
       });
-    } catch(e) {
+    } catch (e) {
       localStorage.removeItem('pt_user');
     }
   }
