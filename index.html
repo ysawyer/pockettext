@@ -1380,6 +1380,8 @@
       let selectedImageFile = null;
       let selectedImagePreviewUrl = null;
       let currentMessages = {};
+      let deleteQueue = Promise.resolve();
+      let deleteInProgress = false;
       let editingMessage = {
         key: null,
         cid: null,
@@ -1950,18 +1952,38 @@
         showToast("message updated");
       };
 
-      window.deleteMessage = async function (key) {
+      window.deleteMessage = function (key) {
+        deleteQueue = deleteQueue
+          .then(() => deleteMessageQueued(key))
+          .catch((err) => {
+            console.error(err);
+            showToast("delete failed");
+          });
+      };
+
+      async function deleteMessageQueued(key) {
+        if (deleteInProgress) return;
         if (!activeConvo) return;
+
         const msg = currentMessages[key];
         if (!msg || msg.from !== currentUser.number) return;
 
         const ok = confirm("Delete this message?");
         if (!ok) return;
 
-        const cid = convoId(currentUser.number, activeConvo);
-        await remove(dbRef(db, `convos/${cid}/${key}`));
-        showToast("message deleted");
-      };
+        deleteInProgress = true;
+
+        try {
+          const cid = convoId(currentUser.number, activeConvo);
+          await remove(dbRef(db, `convos/${cid}/${key}`));
+          showToast("message deleted");
+        } catch (err) {
+          console.error(err);
+          showToast("delete failed");
+        } finally {
+          deleteInProgress = false;
+        }
+      }
 
       async function uploadSelectedImage(cid) {
         if (!selectedImageFile) return null;
