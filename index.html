@@ -384,6 +384,31 @@
         background: var(--surface2);
       }
 
+      /* Edit button shown on hover */
+      .contact-item .edit-contact-btn {
+        display: none;
+        border: none;
+        background: rgba(78, 165, 255, 0.12);
+        color: var(--accent);
+        border-radius: 8px;
+        width: 28px;
+        height: 28px;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: all 0.15s;
+        font-size: 14px;
+      }
+
+      .contact-item:hover .edit-contact-btn {
+        display: flex;
+      }
+
+      .contact-item .edit-contact-btn:hover {
+        background: rgba(78, 165, 255, 0.22);
+      }
+
       .avatar {
         width: 42px;
         height: 42px;
@@ -1005,6 +1030,18 @@
         background: #000;
       }
 
+      /* Edit contact modal note */
+      .edit-contact-note {
+        background: rgba(78, 165, 255, 0.08);
+        border: 1px solid rgba(78, 165, 255, 0.2);
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 12px;
+        color: var(--accent);
+        line-height: 1.5;
+        margin-bottom: 18px;
+      }
+
       @media (max-width: 640px) {
         .sidebar {
           width: 100%;
@@ -1234,6 +1271,7 @@
       </div>
     </div>
 
+    <!-- Add Contact Modal -->
     <div class="modal-overlay" id="add-contact-modal">
       <div class="modal">
         <h3>Add Contact</h3>
@@ -1264,6 +1302,45 @@
       </div>
     </div>
 
+    <!-- Edit Contact Modal -->
+    <div class="modal-overlay" id="edit-contact-modal">
+      <div class="modal">
+        <h3>Edit Contact</h3>
+        <div class="error-msg" id="edit-contact-error"></div>
+        <div class="edit-contact-note">
+          💡 Update the nickname to change how they appear, or enter a new
+          number if they switched accounts.
+        </div>
+        <label>Nickname</label>
+        <input
+          type="text"
+          id="edit-contact-nickname"
+          placeholder="Display name (blank = use their real name)"
+        />
+        <label>Their 4-Digit Number</label>
+        <input
+          type="text"
+          id="edit-contact-number"
+          placeholder="1234"
+          maxlength="4"
+          style="font-size: 24px; letter-spacing: 4px; text-align: center"
+          oninput="this.value = this.value.replace(/\D/g, '')"
+        />
+        <div class="modal-actions">
+          <button
+            class="btn btn-ghost btn-sm"
+            onclick="closeEditContactModal()"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="saveEditedContact()">
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Message Modal -->
     <div class="modal-overlay" id="edit-message-modal">
       <div class="modal">
         <h3>Edit Message</h3>
@@ -1283,6 +1360,7 @@
       </div>
     </div>
 
+    <!-- Delete Account Modal -->
     <div class="modal-overlay" id="delete-account-modal">
       <div class="modal">
         <h3>Delete Account</h3>
@@ -1319,6 +1397,7 @@
       </div>
     </div>
 
+    <!-- Image Lightbox -->
     <div class="modal-overlay" id="image-modal">
       <div
         class="modal"
@@ -1382,11 +1461,10 @@
       let currentMessages = {};
       let deleteQueue = Promise.resolve();
       let deleteInProgress = false;
-      let editingMessage = {
-        key: null,
-        cid: null,
-        data: null,
-      };
+      let editingMessage = { key: null, cid: null, data: null };
+
+      // Tracks which contact number is being edited
+      let editingContactNumber = null;
 
       const $ = (id) => document.getElementById(id);
 
@@ -1523,8 +1601,7 @@
               <div class="link-preview-title">${title}</div>
               ${desc ? `<div class="link-preview-desc">${desc}</div>` : ""}
             </div>
-          </div>
-        `;
+          </div>`;
       }
 
       function clearAttachment() {
@@ -1551,14 +1628,12 @@
               <div class="attachment-sub">${escapeHtml(Math.round(file.size / 1024))} KB</div>
             </div>
             <button class="attachment-remove" type="button" onclick="removeSelectedImage()">×</button>
-          </div>
-        `;
+          </div>`;
       }
 
       window.removeSelectedImage = function () {
         clearAttachment();
       };
-
       window.openImagePicker = function () {
         $("image-input").click();
       };
@@ -1594,7 +1669,6 @@
         }
 
         errEl.textContent = "";
-
         const snap = await get(dbRef(db, `users/${username}`));
         if (snap.exists()) {
           errEl.textContent = "Username already taken.";
@@ -1608,7 +1682,6 @@
           number,
           passwordHash: hashPassword(password),
         };
-
         await set(dbRef(db, `users/${username}`), userData);
         await loginSuccess(userData);
       };
@@ -1665,7 +1738,6 @@
         onValue(dbRef(db, "convos"), (snap) => {
           if (!snap.exists()) return;
           const all = snap.val();
-
           Object.entries(all).forEach(([cid, msgs]) => {
             if (!cid.includes(currentUser.number)) return;
             let unread = 0;
@@ -1677,7 +1749,6 @@
               .find((n) => n !== currentUser.number);
             unreadCounts[otherNum] = unread;
           });
-
           renderSidebar();
         });
       }
@@ -1695,14 +1766,15 @@
                 const unread = unreadCounts[c.number] || 0;
                 const displayName = c.nickname || c.name;
                 return `
-                  <div class="contact-item ${activeConvo === c.number ? "active" : ""}" onclick="openChat('${c.number}')">
-                    <div class="avatar">${getInitials(displayName)}</div>
-                    <div class="contact-info">
-                      <div class="contact-name">${escapeHtml(displayName)}</div>
-                      <div class="contact-preview">#${escapeHtml(c.number)}</div>
-                    </div>
-                    ${unread > 0 ? `<div class="unread-badge">${unread}</div>` : ""}
-                  </div>`;
+                <div class="contact-item ${activeConvo === c.number ? "active" : ""}" onclick="openChat('${c.number}')">
+                  <div class="avatar">${getInitials(displayName)}</div>
+                  <div class="contact-info">
+                    <div class="contact-name">${escapeHtml(displayName)}</div>
+                    <div class="contact-preview">#${escapeHtml(c.number)}</div>
+                  </div>
+                  ${unread > 0 ? `<div class="unread-badge">${unread}</div>` : ""}
+                  <button class="edit-contact-btn" type="button" title="Edit contact" onclick="event.stopPropagation(); openEditContact('${escapeAttr(c.number)}')">✏️</button>
+                </div>`;
               })
               .join("");
           }
@@ -1716,19 +1788,122 @@
               .map((c) => {
                 const displayName = c.nickname || c.name;
                 return `
-                  <div class="contact-item" onclick="openChat('${c.number}')">
-                    <div class="avatar">${getInitials(displayName)}</div>
-                    <div class="contact-info">
-                      <div class="contact-name">${escapeHtml(displayName)}</div>
-                      <div class="contact-num">#${escapeHtml(c.number)}</div>
-                    </div>
-                  </div>`;
+                <div class="contact-item" onclick="openChat('${c.number}')">
+                  <div class="avatar">${getInitials(displayName)}</div>
+                  <div class="contact-info">
+                    <div class="contact-name">${escapeHtml(displayName)}</div>
+                    <div class="contact-num">#${escapeHtml(c.number)}</div>
+                  </div>
+                  <button class="edit-contact-btn" type="button" title="Edit contact" onclick="event.stopPropagation(); openEditContact('${escapeAttr(c.number)}')">✏️</button>
+                </div>`;
               })
               .join("");
           }
           el.innerHTML += `<button class="add-contact-btn" onclick="openAddContact()">+ Add Contact</button>`;
         }
       }
+
+      // ── Edit Contact ──────────────────────────────────────────────────────────
+
+      window.openEditContact = function (oldNumber) {
+        const contact = contacts[oldNumber];
+        if (!contact) return;
+        editingContactNumber = oldNumber;
+
+        $("edit-contact-error").textContent = "";
+        $("edit-contact-nickname").value = contact.nickname || "";
+        $("edit-contact-number").value = contact.number;
+        $("edit-contact-modal").classList.add("open");
+      };
+
+      window.closeEditContactModal = function () {
+        $("edit-contact-modal").classList.remove("open");
+        $("edit-contact-error").textContent = "";
+        editingContactNumber = null;
+      };
+
+      window.saveEditedContact = async function () {
+        const err = $("edit-contact-error");
+        const newNickname = $("edit-contact-nickname").value.trim();
+        const newNumber = $("edit-contact-number").value.trim();
+
+        if (!editingContactNumber) {
+          err.textContent = "No contact selected.";
+          return;
+        }
+        if (newNumber.length !== 4) {
+          err.textContent = "Enter a valid 4-digit number.";
+          return;
+        }
+        if (newNumber === currentUser.number) {
+          err.textContent = "That's your own number!";
+          return;
+        }
+
+        // If the number changed, look up the new user in Firebase
+        const oldContact = contacts[editingContactNumber];
+        let resolvedName = oldContact.name;
+
+        if (newNumber !== editingContactNumber) {
+          // Make sure a user with that number exists
+          const snap = await get(dbRef(db, "users"));
+          if (!snap.exists()) {
+            err.textContent = "No users found.";
+            return;
+          }
+          let found = null;
+          Object.values(snap.val()).forEach((u) => {
+            if (u.number === newNumber) found = u;
+          });
+          if (!found) {
+            err.textContent = "No user with that number.";
+            return;
+          }
+          resolvedName = found.name;
+
+          // Remove the old contact entry (old number as key)
+          await remove(
+            dbRef(
+              db,
+              `contacts/${currentUser.username}/${editingContactNumber}`,
+            ),
+          );
+          delete contacts[editingContactNumber];
+
+          // If the active chat was the old number, close it
+          if (activeConvo === editingContactNumber) {
+            activeConvo = null;
+            $("empty-state").style.display = "";
+            $("active-chat").style.display = "none";
+          }
+        }
+
+        // Save the updated contact under the new number key
+        const updatedContact = {
+          number: newNumber,
+          name: resolvedName,
+          nickname: newNickname,
+        };
+        await set(
+          dbRef(db, `contacts/${currentUser.username}/${newNumber}`),
+          updatedContact,
+        );
+        contacts[newNumber] = updatedContact;
+
+        closeEditContactModal();
+        showToast("Contact updated!");
+        renderSidebar();
+
+        // If we updated the currently open chat, refresh the header
+        if (activeConvo === newNumber) {
+          const displayName = newNickname || resolvedName;
+          $("chat-contact-name").textContent = displayName;
+          $("chat-contact-num").textContent = "#" + newNumber;
+          $("chat-avatar").textContent = getInitials(displayName);
+        }
+      };
+
+      // ── Add Contact ───────────────────────────────────────────────────────────
 
       window.addContact = async function () {
         const num = $("contact-number").value.trim();
@@ -1754,7 +1929,6 @@
         Object.values(snap.val()).forEach((u) => {
           if (u.number === num) found = u;
         });
-
         if (!found) {
           errEl.textContent = "No user with that number.";
           return;
@@ -1839,7 +2013,6 @@
             }
 
             let contentHtml = "";
-
             if (m.type === "image" && m.imageUrl) {
               contentHtml += `<img src="${escapeAttr(m.imageUrl)}" alt="sent image" class="image-message" onclick="openImageLightbox('${escapeAttr(m.imageUrl)}')">`;
               if (m.caption) {
@@ -1856,22 +2029,20 @@
             }
 
             const actions = out
-              ? `
-                <div class="message-actions">
-                  <button class="message-action-btn" type="button" onclick="editMessage('${key}')">Edit</button>
-                  <button class="message-action-btn" type="button" onclick="deleteMessage('${key}')">Delete</button>
-                </div>
-              `
+              ? `<div class="message-actions">
+                <button class="message-action-btn" type="button" onclick="editMessage('${key}')">Edit</button>
+                <button class="message-action-btn" type="button" onclick="deleteMessage('${key}')">Delete</button>
+               </div>`
               : "";
 
             return `${divider}
-              <div class="msg-row ${out ? "outgoing" : "incoming"}" data-key="${escapeAttr(key)}">
-                <div class="bubble">
-                  ${contentHtml || "&nbsp;"}
-                  ${actions}
-                </div>
-                <div class="msg-time">${escapeHtml(timeStr(m.ts))}</div>
-              </div>`;
+            <div class="msg-row ${out ? "outgoing" : "incoming"}" data-key="${escapeAttr(key)}">
+              <div class="bubble">
+                ${contentHtml || "&nbsp;"}
+                ${actions}
+              </div>
+              <div class="msg-time">${escapeHtml(timeStr(m.ts))}</div>
+            </div>`;
           })
           .join("");
 
@@ -1888,7 +2059,6 @@
           cid: convoId(currentUser.number, activeConvo),
           data: { ...msg },
         };
-
         $("edit-message-error").textContent = "";
         $("edit-message-text").value =
           msg.type === "image" ? msg.caption || "" : msg.text || "";
@@ -1916,19 +2086,12 @@
         }
 
         const base = { ...editingMessage.data };
-
         if (base.type === "image") {
-          if (nextText) {
-            base.caption = nextText;
-          } else {
-            delete base.caption;
-          }
+          if (nextText) base.caption = nextText;
+          else delete base.caption;
           const firstUrl = extractFirstUrl(nextText);
-          if (firstUrl) {
-            base.linkPreview = await fetchLinkPreview(firstUrl);
-          } else {
-            delete base.linkPreview;
-          }
+          if (firstUrl) base.linkPreview = await fetchLinkPreview(firstUrl);
+          else delete base.linkPreview;
         } else {
           if (!nextText) {
             err.textContent = "Message text cannot be empty.";
@@ -1936,18 +2099,14 @@
           }
           base.text = nextText;
           const firstUrl = extractFirstUrl(nextText);
-          if (firstUrl) {
-            base.linkPreview = await fetchLinkPreview(firstUrl);
-          } else {
-            delete base.linkPreview;
-          }
+          if (firstUrl) base.linkPreview = await fetchLinkPreview(firstUrl);
+          else delete base.linkPreview;
         }
 
         await set(
           dbRef(db, `convos/${editingMessage.cid}/${editingMessage.key}`),
           base,
         );
-
         closeEditModal();
         showToast("message updated");
       };
@@ -1964,15 +2123,11 @@
       async function deleteMessageQueued(key) {
         if (deleteInProgress) return;
         if (!activeConvo) return;
-
         const msg = currentMessages[key];
         if (!msg || msg.from !== currentUser.number) return;
-
         const ok = confirm("Delete this message?");
         if (!ok) return;
-
         deleteInProgress = true;
-
         try {
           const cid = convoId(currentUser.number, activeConvo);
           await remove(dbRef(db, `convos/${cid}/${key}`));
@@ -1987,12 +2142,9 @@
 
       async function uploadSelectedImage(cid) {
         if (!selectedImageFile) return null;
-
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
-          reader.onload = function (e) {
-            resolve(e.target.result);
-          };
+          reader.onload = (e) => resolve(e.target.result);
           reader.onerror = reject;
           reader.readAsDataURL(selectedImageFile);
         });
@@ -2001,17 +2153,13 @@
       window.sendMessage = async function () {
         const input = $("message-input");
         const text = input.value.trim();
-
         if (!activeConvo && !selectedImageFile) return;
         if (!text && !selectedImageFile) return;
 
         const cid = convoId(currentUser.number, activeConvo);
-
         let linkPreview = null;
         const firstUrl = extractFirstUrl(text);
-        if (firstUrl) {
-          linkPreview = await fetchLinkPreview(firstUrl);
-        }
+        if (firstUrl) linkPreview = await fetchLinkPreview(firstUrl);
 
         let imageUrl = null;
         if (selectedImageFile) {
@@ -2029,7 +2177,6 @@
           ts: Date.now(),
           read: false,
         };
-
         if (imageUrl) {
           message.type = "image";
           message.imageUrl = imageUrl;
@@ -2042,7 +2189,6 @@
         }
 
         await push(dbRef(db, `convos/${cid}`), message);
-
         input.value = "";
         input.style.height = "auto";
         clearAttachment();
@@ -2119,7 +2265,6 @@
           err.textContent = "Type DELETE exactly to confirm.";
           return;
         }
-
         if (!password) {
           err.textContent = "Enter your password.";
           return;
@@ -2148,15 +2293,11 @@
           const cid = convoId(currentUser.number, num);
           const convoSnap = await get(dbRef(db, `convos/${cid}`));
           if (!convoSnap.exists()) continue;
-
           const convoMsgs = convoSnap.val();
           const remaining = {};
           Object.entries(convoMsgs).forEach(([k, m]) => {
-            if (m.from !== currentUser.number) {
-              remaining[k] = m;
-            }
+            if (m.from !== currentUser.number) remaining[k] = m;
           });
-
           if (Object.keys(remaining).length > 0) {
             await set(dbRef(db, `convos/${cid}`), remaining);
           } else {
@@ -2184,11 +2325,13 @@
 
       document.addEventListener("click", (e) => {
         const addModal = $("add-contact-modal");
+        const editContactModal = $("edit-contact-modal");
         const editModal = $("edit-message-modal");
         const deleteModal = $("delete-account-modal");
         const imageModal = $("image-modal");
 
         if (e.target === addModal) closeModal();
+        if (e.target === editContactModal) closeEditContactModal();
         if (e.target === editModal) closeEditModal();
         if (e.target === deleteModal) closeDeleteAccountModal();
         if (e.target === imageModal) closeImageLightbox();
