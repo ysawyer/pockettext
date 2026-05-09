@@ -1142,7 +1142,7 @@
           placeholder="••••••••"
           autocomplete="current-password"
         />
-        <button class="btn btn-primary" onclick="loginUser()">Sign In</button>
+        <button class="btn btn-primary" id="sign-in-btn">Sign In</button>
         <button class="btn btn-ghost" onclick="showRegister()">
           Create new account →
         </button>
@@ -2676,6 +2676,17 @@
         if (e.target === $("image-modal")) closeImageLightbox();
         if (e.target === $("create-group-modal")) closeCreateGroupModal();
       });
+
+      // Better mobile button handling
+      document
+        .getElementById("sign-in-btn")
+        .addEventListener("click", loginUser);
+      document
+        .getElementById("sign-in-btn")
+        .addEventListener("touchend", function (e) {
+          e.preventDefault();
+          loginUser();
+        });
 
       // ── Auto-login ───────────────────────────────────────────────────────────
 
