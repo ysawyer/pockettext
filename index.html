@@ -2,16 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PocketText</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap"
       rel="stylesheet"
     />
+
     <style>
       :root {
         --bg: #08111f;
@@ -25,7 +23,6 @@
         --muted: #7f92ad;
         --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
         --radius: 18px;
-        --sidebar-w: 320px;
       }
 
       * {
@@ -34,6 +31,7 @@
         padding: 0;
         -webkit-tap-highlight-color: transparent;
       }
+
       a,
       button,
       input,
@@ -41,18 +39,17 @@
       img {
         outline: none;
       }
+
       a:focus,
       a:active,
       button:focus,
       button:active,
       input:focus,
-      textarea:focus {
+      textarea:focus,
+      img:focus,
+      img:active {
         outline: none;
         box-shadow: none;
-      }
-
-      html {
-        height: 100%;
       }
 
       body {
@@ -65,9 +62,7 @@
           ),
           var(--bg);
         color: var(--text);
-        height: 100%;
-        min-height: 100vh;
-        min-height: 100dvh;
+        height: 100vh;
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -77,22 +72,18 @@
         display: none;
         flex-direction: column;
         height: 100vh;
-        height: 100dvh;
       }
+
       .screen.active {
         display: flex;
       }
 
-      /* ── Auth Screen ── */
       #auth-screen {
         align-items: center;
         justify-content: center;
         background: var(--bg);
         position: relative;
         overflow: hidden;
-        /* Critical for mobile scroll when keyboard opens */
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
       }
 
       .grid-bg {
@@ -103,7 +94,6 @@
           linear-gradient(90deg, var(--border) 1px, transparent 1px);
         background-size: 40px 40px;
         opacity: 0.3;
-        pointer-events: none;
       }
 
       .auth-card {
@@ -116,12 +106,10 @@
         border: 1px solid rgba(124, 201, 255, 0.16);
         border-radius: 24px;
         padding: 48px 40px;
-        width: 380px;
-        max-width: calc(100vw - 32px);
+        width: 360px;
+        max-width: 90vw;
         box-shadow: var(--shadow);
         animation: fadeUp 0.5s ease;
-        /* Ensure it's always visible and tappable */
-        z-index: 10;
       }
 
       @keyframes fadeUp {
@@ -141,6 +129,7 @@
         gap: 10px;
         margin-bottom: 32px;
       }
+
       .logo-icon {
         width: 40px;
         height: 40px;
@@ -152,12 +141,14 @@
         font-size: 20px;
         color: #07111f;
       }
+
       .logo-text {
         font-size: 22px;
         font-weight: 800;
         letter-spacing: -0.5px;
         color: var(--text);
       }
+
       .logo-text span {
         color: var(--accent);
       }
@@ -168,6 +159,7 @@
         margin-bottom: 6px;
         letter-spacing: -0.5px;
       }
+
       .auth-sub {
         color: var(--muted);
         font-size: 14px;
@@ -191,20 +183,16 @@
         background: var(--surface2);
         border: 1px solid var(--border);
         border-radius: 12px;
-        padding: 14px 16px;
+        padding: 12px 16px;
         color: var(--text);
         font-family: "DM Mono", monospace;
-        font-size: 16px; /* 16px prevents iOS zoom */
+        font-size: 14px;
         outline: none;
         transition:
           border-color 0.2s,
           box-shadow 0.2s,
           background 0.2s;
         margin-bottom: 18px;
-        /* Prevent iOS styling */
-        -webkit-appearance: none;
-        appearance: none;
-        border-radius: 12px;
       }
 
       input:focus,
@@ -215,25 +203,18 @@
       }
 
       .btn {
-        display: block;
         width: 100%;
-        padding: 16px;
+        padding: 14px;
         border: none;
         border-radius: 12px;
         font-family: "Syne", sans-serif;
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 700;
         cursor: pointer;
-        transition: all 0.15s;
+        transition:
+          all 0.15s,
+          box-shadow 0.15s;
         letter-spacing: 0.3px;
-        /* Critical for iOS button touch */
-        -webkit-appearance: none;
-        appearance: none;
-        position: relative;
-        z-index: 20;
-        touch-action: manipulation;
-        user-select: none;
-        -webkit-user-select: none;
       }
 
       .btn-primary {
@@ -241,12 +222,14 @@
         color: #07111f;
         box-shadow: 0 10px 25px rgba(78, 165, 255, 0.22);
       }
+
       .btn-primary:hover {
+        transform: translateY(-1px);
         filter: brightness(1.05);
       }
+
       .btn-primary:active {
-        transform: scale(0.98);
-        filter: brightness(0.95);
+        transform: translateY(0);
       }
 
       .btn-ghost {
@@ -255,6 +238,7 @@
         border: 1px solid var(--border);
         margin-top: 10px;
       }
+
       .btn-ghost:hover {
         border-color: var(--accent);
         color: var(--text);
@@ -267,15 +251,13 @@
         min-height: 18px;
       }
 
-      /* ── App Layout ── */
       #app-screen {
         flex-direction: row;
-        overflow: hidden;
       }
 
       .sidebar {
-        width: var(--sidebar-w);
-        min-width: var(--sidebar-w);
+        width: 320px;
+        min-width: 320px;
         background: linear-gradient(
           180deg,
           rgba(14, 23, 41, 0.98),
@@ -284,7 +266,7 @@
         border-right: 1px solid var(--border);
         display: flex;
         flex-direction: column;
-        flex-shrink: 0;
+        box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.02);
       }
 
       .sidebar-header {
@@ -295,9 +277,11 @@
         align-items: center;
         gap: 12px;
       }
+
       .sidebar-header-left {
         min-width: 0;
       }
+
       .sidebar-logo {
         font-size: 18px;
         font-weight: 800;
@@ -306,9 +290,11 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
+
       .sidebar-logo span {
         color: var(--accent);
       }
+
       .sidebar-header-actions {
         display: flex;
         align-items: center;
@@ -326,6 +312,7 @@
         padding: 4px 10px;
         white-space: nowrap;
       }
+
       .account-btn {
         border: 1px solid var(--border);
         background: transparent;
@@ -336,8 +323,8 @@
         font-family: "Syne", sans-serif;
         cursor: pointer;
         transition: all 0.15s;
-        touch-action: manipulation;
       }
+
       .account-btn:hover {
         color: var(--text);
         border-color: var(--accent);
@@ -347,6 +334,7 @@
         display: flex;
         border-bottom: 1px solid var(--border);
       }
+
       .tab-btn {
         flex: 1;
         padding: 12px;
@@ -360,12 +348,13 @@
         transition: all 0.15s;
         border-bottom: 2px solid transparent;
         letter-spacing: 0.3px;
-        touch-action: manipulation;
       }
+
       .tab-btn.active {
         color: var(--accent);
         border-bottom-color: var(--accent);
       }
+
       .tab-btn:hover:not(.active) {
         color: var(--text);
       }
@@ -374,13 +363,6 @@
         flex: 1;
         overflow-y: auto;
         padding: 12px;
-      }
-      .sidebar-content::-webkit-scrollbar {
-        width: 4px;
-      }
-      .sidebar-content::-webkit-scrollbar-thumb {
-        background: var(--border);
-        border-radius: 2px;
       }
 
       .contact-item {
@@ -392,36 +374,14 @@
         cursor: pointer;
         transition: background 0.15s;
         position: relative;
-        touch-action: manipulation;
       }
+
       .contact-item:hover {
         background: var(--surface2);
       }
+
       .contact-item.active {
         background: var(--surface2);
-      }
-
-      .contact-item .edit-contact-btn {
-        display: none;
-        border: none;
-        background: rgba(78, 165, 255, 0.12);
-        color: var(--accent);
-        border-radius: 8px;
-        width: 28px;
-        height: 28px;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        flex-shrink: 0;
-        transition: all 0.15s;
-        font-size: 14px;
-        touch-action: manipulation;
-      }
-      .contact-item:hover .edit-contact-btn {
-        display: flex;
-      }
-      .contact-item .edit-contact-btn:hover {
-        background: rgba(78, 165, 255, 0.22);
       }
 
       .avatar {
@@ -442,19 +402,12 @@
         color: var(--accent);
         flex-shrink: 0;
       }
-      .avatar.group-avatar {
-        background: linear-gradient(
-          180deg,
-          rgba(124, 201, 255, 0.2),
-          rgba(78, 165, 255, 0.08)
-        );
-        font-size: 20px;
-      }
 
       .contact-info {
         flex: 1;
         min-width: 0;
       }
+
       .contact-name {
         font-size: 14px;
         font-weight: 600;
@@ -462,11 +415,13 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
+
       .contact-num {
         font-family: "DM Mono", monospace;
         font-size: 12px;
         color: var(--muted);
       }
+
       .contact-preview {
         font-size: 12px;
         color: var(--muted);
@@ -502,14 +457,13 @@
         cursor: pointer;
         transition: all 0.15s;
         margin-top: 8px;
-        touch-action: manipulation;
       }
+
       .add-contact-btn:hover {
         background: rgba(78, 165, 255, 0.14);
         border-color: var(--accent);
       }
 
-      /* ── Chat Panel ── */
       .chat-panel {
         flex: 1;
         display: flex;
@@ -521,8 +475,6 @@
             transparent 30%
           ),
           var(--bg);
-        min-width: 0;
-        overflow: hidden;
       }
 
       .chat-header {
@@ -533,37 +485,18 @@
         gap: 14px;
         background: rgba(14, 23, 41, 0.92);
         backdrop-filter: blur(10px);
-        flex-shrink: 0;
-      }
-
-      .back-btn {
-        display: none;
-        border: none;
-        background: rgba(78, 165, 255, 0.1);
-        color: var(--accent);
-        border-radius: 10px;
-        width: 36px;
-        height: 36px;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 18px;
-        flex-shrink: 0;
-        touch-action: manipulation;
-        transition: background 0.15s;
-      }
-      .back-btn:hover {
-        background: rgba(78, 165, 255, 0.2);
       }
 
       .chat-header-info {
         flex: 1;
         min-width: 0;
       }
+
       .chat-contact-name {
         font-size: 16px;
         font-weight: 700;
       }
+
       .chat-contact-num {
         font-family: "DM Mono", monospace;
         font-size: 12px;
@@ -579,12 +512,15 @@
         gap: 8px;
         scroll-behavior: smooth;
       }
+
       .chat-messages::-webkit-scrollbar {
         width: 4px;
       }
+
       .chat-messages::-webkit-scrollbar-track {
         background: transparent;
       }
+
       .chat-messages::-webkit-scrollbar-thumb {
         background: var(--border);
         border-radius: 2px;
@@ -596,10 +532,12 @@
         gap: 8px;
         max-width: 70%;
       }
+
       .msg-row.outgoing {
         align-self: flex-end;
         flex-direction: row-reverse;
       }
+
       .msg-row.incoming {
         align-self: flex-start;
       }
@@ -613,12 +551,14 @@
         max-width: 100%;
         overflow: hidden;
       }
+
       .outgoing .bubble {
         background: linear-gradient(135deg, var(--accent), var(--accent2));
         color: #07111f;
         border-bottom-right-radius: 4px;
         box-shadow: 0 10px 24px rgba(78, 165, 255, 0.16);
       }
+
       .incoming .bubble {
         background: var(--surface2);
         color: var(--text);
@@ -634,13 +574,6 @@
         margin-bottom: 2px;
         flex-shrink: 0;
       }
-      .msg-sender {
-        font-size: 11px;
-        color: var(--accent2);
-        font-weight: 600;
-        margin-bottom: 4px;
-        font-family: "DM Mono", monospace;
-      }
 
       .message-actions {
         display: flex;
@@ -649,6 +582,7 @@
         margin-top: 10px;
         flex-wrap: wrap;
       }
+
       .message-action-btn {
         border: 1px solid rgba(255, 255, 255, 0.12);
         background: transparent;
@@ -660,13 +594,14 @@
         cursor: pointer;
         opacity: 0.85;
         transition: all 0.15s;
-        touch-action: manipulation;
       }
+
       .message-action-btn:hover {
         opacity: 1;
         transform: translateY(-1px);
         border-color: rgba(78, 165, 255, 0.35);
       }
+
       .outgoing .message-action-btn {
         border-color: rgba(7, 17, 31, 0.14);
       }
@@ -674,12 +609,12 @@
       .chat-input-stack {
         border-top: 1px solid var(--border);
         background: rgba(14, 23, 41, 0.95);
-        flex-shrink: 0;
       }
 
       .attachment-preview {
         padding: 12px 24px 0;
       }
+
       .attachment-chip {
         display: inline-flex;
         align-items: center;
@@ -690,6 +625,7 @@
         padding: 10px 12px;
         max-width: 100%;
       }
+
       .attachment-thumb {
         width: 44px;
         height: 44px;
@@ -698,10 +634,12 @@
         border: 1px solid var(--border);
         flex-shrink: 0;
       }
+
       .attachment-meta {
         min-width: 0;
         flex: 1;
       }
+
       .attachment-name {
         font-size: 13px;
         font-weight: 700;
@@ -709,11 +647,13 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
+
       .attachment-sub {
         font-size: 11px;
         color: var(--muted);
         font-family: "DM Mono", monospace;
       }
+
       .attachment-remove {
         border: none;
         background: transparent;
@@ -722,7 +662,6 @@
         font-size: 18px;
         line-height: 1;
         padding: 0 4px;
-        touch-action: manipulation;
       }
 
       .chat-input-area {
@@ -730,7 +669,9 @@
         display: flex;
         gap: 12px;
         align-items: flex-end;
+        background: transparent;
       }
+
       .chat-input-wrap {
         flex: 1;
         display: flex;
@@ -755,8 +696,8 @@
         justify-content: center;
         flex-shrink: 0;
         transition: all 0.15s;
-        touch-action: manipulation;
       }
+
       .attach-btn:hover {
         border-color: var(--accent);
         color: var(--accent);
@@ -768,14 +709,13 @@
         border: none;
         color: var(--text);
         font-family: "Syne", sans-serif;
-        font-size: 16px;
+        font-size: 14px;
         outline: none;
         resize: none;
         max-height: 120px;
         line-height: 1.5;
-        padding: 4px 4px;
+        padding: 6px 4px;
         margin-bottom: 0;
-        -webkit-appearance: none;
       }
 
       .send-btn {
@@ -791,15 +731,17 @@
         transition: all 0.15s;
         flex-shrink: 0;
         box-shadow: 0 10px 25px rgba(78, 165, 255, 0.2);
-        touch-action: manipulation;
       }
+
       .send-btn:hover {
         filter: brightness(1.05);
         transform: scale(1.03);
       }
+
       .send-btn:active {
         transform: scale(0.97);
       }
+
       .send-btn svg {
         color: #07111f;
       }
@@ -815,21 +757,23 @@
         text-align: center;
         padding: 40px;
       }
+
       .empty-icon {
         font-size: 48px;
         opacity: 0.5;
       }
+
       .empty-title {
         font-size: 18px;
         font-weight: 700;
         color: var(--text);
       }
+
       .empty-sub {
         font-size: 14px;
         max-width: 280px;
       }
 
-      /* ── Modals ── */
       .modal-overlay {
         display: none;
         position: fixed;
@@ -841,9 +785,11 @@
         justify-content: center;
         padding: 20px;
       }
+
       .modal-overlay.open {
         display: flex;
       }
+
       .modal {
         background: linear-gradient(
           180deg,
@@ -853,43 +799,55 @@
         border: 1px solid rgba(124, 201, 255, 0.16);
         border-radius: 20px;
         padding: 32px;
-        width: 420px;
-        max-width: calc(100vw - 32px);
-        max-height: 90vh;
-        overflow-y: auto;
+        width: 380px;
+        max-width: 95vw;
         box-shadow: var(--shadow);
         animation: fadeUp 0.25s ease;
       }
+
       .modal h3 {
         font-size: 20px;
         font-weight: 700;
         margin-bottom: 16px;
       }
+
       .modal p {
         color: var(--muted);
         font-size: 14px;
         line-height: 1.5;
         margin-bottom: 16px;
       }
+
       .modal textarea {
         min-height: 120px;
         resize: vertical;
         margin-bottom: 0;
       }
+
       .modal-actions {
         display: flex;
         gap: 10px;
         margin-top: 20px;
       }
+
       .modal-actions .btn {
         flex: 1;
       }
+
       .btn-sm {
-        padding: 12px 16px;
-        font-size: 14px;
+        padding: 10px 16px;
+        font-size: 13px;
       }
 
-      /* ── Toast ── */
+      .sidebar-content::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .sidebar-content::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 2px;
+      }
+
       .toast {
         position: fixed;
         bottom: 24px;
@@ -906,11 +864,11 @@
         white-space: nowrap;
         box-shadow: var(--shadow);
       }
+
       .toast.show {
         transform: translateX(-50%) translateY(0);
       }
 
-      /* ── Message Styles ── */
       .date-divider {
         display: flex;
         align-items: center;
@@ -920,6 +878,7 @@
         font-family: "DM Mono", monospace;
         margin: 8px 0;
       }
+
       .date-divider::before,
       .date-divider::after {
         content: "";
@@ -934,6 +893,7 @@
         border-radius: 50%;
         animation: pulse 2s infinite;
       }
+
       @keyframes pulse {
         0%,
         100% {
@@ -948,6 +908,7 @@
         white-space: pre-wrap;
         word-break: break-word;
       }
+
       .message-link {
         color: inherit;
         font-weight: 700;
@@ -958,6 +919,7 @@
         padding: 0 6px;
         display: inline-block;
       }
+
       .incoming .message-link {
         color: var(--accent);
         background: rgba(78, 165, 255, 0.08);
@@ -971,10 +933,12 @@
         background: rgba(0, 0, 0, 0.08);
         max-width: 100%;
       }
+
       .incoming .link-preview {
         background: var(--bg);
         border-color: var(--border);
       }
+
       .link-preview-image {
         width: 100%;
         max-height: 180px;
@@ -982,9 +946,11 @@
         display: block;
         background: #0b0b0b;
       }
+
       .link-preview-body {
         padding: 12px;
       }
+
       .link-preview-domain {
         font-size: 11px;
         letter-spacing: 0.4px;
@@ -993,12 +959,14 @@
         margin-bottom: 4px;
         font-family: "DM Mono", monospace;
       }
+
       .link-preview-title {
         font-size: 14px;
         font-weight: 700;
         line-height: 1.35;
         margin-bottom: 4px;
       }
+
       .link-preview-desc {
         font-size: 12px;
         line-height: 1.4;
@@ -1012,260 +980,65 @@
         max-width: 320px;
         max-height: 360px;
         object-fit: cover;
+        background: transparent;
+        border: none;
+        box-shadow: none;
         cursor: zoom-in;
         user-select: none;
         -webkit-user-drag: none;
       }
+
+      .incoming .image-message {
+        border: none;
+      }
+
       .caption-spacer {
         height: 8px;
       }
+
       .image-lightbox-img {
         max-width: 92vw;
         max-height: 86vh;
         object-fit: contain;
         border-radius: 18px;
         box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+        background: #000;
       }
 
-      .edit-contact-note {
-        background: rgba(78, 165, 255, 0.08);
-        border: 1px solid rgba(78, 165, 255, 0.2);
-        border-radius: 10px;
-        padding: 10px 14px;
-        font-size: 12px;
-        color: var(--accent);
-        line-height: 1.5;
-        margin-bottom: 18px;
-      }
-
-      .inbox-section-label {
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        color: var(--muted);
-        padding: 8px 12px 4px;
-      }
-      .contact-item.unknown {
-        opacity: 0.8;
-      }
-      .contact-item.unknown .avatar {
-        background: rgba(255, 127, 147, 0.12);
-        border-color: rgba(255, 127, 147, 0.2);
-        color: #ff9faf;
-      }
-
-      .member-chips {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-bottom: 12px;
-        min-height: 32px;
-      }
-      .member-chip {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(78, 165, 255, 0.14);
-        border: 1px solid rgba(78, 165, 255, 0.3);
-        border-radius: 20px;
-        padding: 4px 10px;
-        font-size: 12px;
-        font-family: "DM Mono", monospace;
-        color: var(--accent);
-      }
-      .member-chip button {
-        background: none;
-        border: none;
-        color: var(--accent);
-        cursor: pointer;
-        font-size: 14px;
-        padding: 0;
-        line-height: 1;
-        opacity: 0.7;
-        touch-action: manipulation;
-      }
-      .member-chip button:hover {
-        opacity: 1;
-      }
-
-      .contact-select-list {
-        max-height: 180px;
-        overflow-y: auto;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        margin-bottom: 12px;
-      }
-      .contact-select-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 8px 12px;
-        cursor: pointer;
-        font-size: 13px;
-        transition: background 0.15s;
-        touch-action: manipulation;
-      }
-      .contact-select-item:hover {
-        background: var(--surface2);
-      }
-      .contact-select-item input[type="checkbox"] {
-        accent-color: var(--accent);
-        width: 16px;
-        height: 16px;
-        flex-shrink: 0;
-      }
-
-      .notif-banner {
-        background: rgba(78, 165, 255, 0.1);
-        border: 1px solid rgba(78, 165, 255, 0.2);
-        border-radius: 10px;
-        padding: 10px 14px;
-        font-size: 12px;
-        color: var(--accent2);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        margin: 8px 12px;
-      }
-      .notif-banner button {
-        background: rgba(78, 165, 255, 0.2);
-        border: none;
-        color: var(--accent);
-        border-radius: 6px;
-        padding: 4px 10px;
-        font-size: 11px;
-        cursor: pointer;
-        font-family: "Syne", sans-serif;
-        font-weight: 600;
-        white-space: nowrap;
-        touch-action: manipulation;
-      }
-      .notif-banner button:hover {
-        background: rgba(78, 165, 255, 0.35);
-      }
-
-      /* ────────────────────────────────────────────
-         RESPONSIVE BREAKPOINTS
-         ──────────────────────────────────────────── */
-
-      /* iPad Mini / Air portrait: 768px */
-      @media (min-width: 641px) and (max-width: 900px) {
-        :root {
-          --sidebar-w: 260px;
-        }
-
-        .sidebar-logo {
-          font-size: 15px;
-        }
-        .my-number {
-          font-size: 11px;
-          padding: 3px 8px;
-        }
-        .account-btn {
-          font-size: 11px;
-          padding: 3px 8px;
-        }
-
-        .chat-messages {
-          padding: 16px;
-        }
-        .chat-input-area {
-          padding: 12px 16px 14px;
-        }
-
-        /* iPad portrait: show sidebar + chat side by side */
-        .sidebar {
-          width: var(--sidebar-w);
-          min-width: var(--sidebar-w);
-        }
-        .chat-panel {
-          display: flex;
-        }
-      }
-
-      /* iPad Pro landscape: 1024px+ — comfortable reading */
-      @media (min-width: 901px) and (max-width: 1200px) {
-        :root {
-          --sidebar-w: 300px;
-        }
-      }
-
-      /* ── Mobile (phones): ≤ 640px ── */
       @media (max-width: 640px) {
-        /* Auth card full-width on mobile */
-        .auth-card {
-          width: calc(100vw - 32px);
-          max-width: 420px;
-          padding: 36px 24px;
-          border-radius: 20px;
-          margin: 16px;
-        }
-
-        .auth-title {
-          font-size: 24px;
-        }
-        .auth-sub {
-          font-size: 13px;
-        }
-
-        /* Sidebar takes full width, chat panel overlays */
-        #app-screen {
-          flex-direction: column;
-          position: relative;
-        }
-
         .sidebar {
           width: 100%;
           min-width: unset;
-          height: 100dvh;
-          flex-shrink: 0;
         }
-        .sidebar.mobile-hidden {
-          display: none;
+
+        #app-screen {
+          flex-direction: column;
         }
 
         .chat-panel {
           display: none;
+        }
+
+        .chat-panel.mobile-open {
+          display: flex;
           position: fixed;
           inset: 0;
           z-index: 50;
-          height: 100dvh;
-        }
-        .chat-panel.mobile-open {
-          display: flex;
         }
 
-        .back-btn {
-          display: flex;
+        .sidebar.mobile-hidden {
+          display: none;
         }
 
         .msg-row {
           max-width: 86%;
         }
-        .chat-messages {
-          padding: 16px;
-        }
-        .chat-input-area {
-          padding: 12px 16px max(14px, env(safe-area-inset-bottom));
-        }
-      }
-
-      /* ── iPad split-view safe areas ── */
-      @supports (padding-bottom: env(safe-area-inset-bottom)) {
-        .chat-input-area {
-          padding-bottom: max(18px, env(safe-area-inset-bottom));
-        }
       }
     </style>
   </head>
   <body>
-    <!-- ── AUTH SCREEN ── -->
     <div id="auth-screen" class="screen active">
       <div class="grid-bg"></div>
-
-      <!-- Login Card -->
       <div class="auth-card" id="login-card">
         <div class="logo">
           <div class="logo-icon">💬</div>
@@ -1280,9 +1053,6 @@
           id="login-username"
           placeholder="your_username"
           autocomplete="username"
-          autocorrect="off"
-          autocapitalize="none"
-          spellcheck="false"
         />
         <label>Password</label>
         <input
@@ -1291,16 +1061,12 @@
           placeholder="••••••••"
           autocomplete="current-password"
         />
-        <!-- Native button with type=button avoids form submit race on iOS -->
-        <button type="button" class="btn btn-primary" id="sign-in-btn">
-          Sign In
-        </button>
-        <button type="button" class="btn btn-ghost" id="goto-register-btn">
+        <button class="btn btn-primary" onclick="loginUser()">Sign In</button>
+        <button class="btn btn-ghost" onclick="showRegister()">
           Create new account →
         </button>
       </div>
 
-      <!-- Register Card -->
       <div class="auth-card" id="register-card" style="display: none">
         <div class="logo">
           <div class="logo-icon">💬</div>
@@ -1315,17 +1081,9 @@
           id="reg-username"
           placeholder="your_username"
           autocomplete="username"
-          autocorrect="off"
-          autocapitalize="none"
-          spellcheck="false"
         />
         <label>Display Name</label>
-        <input
-          type="text"
-          id="reg-name"
-          placeholder="Your Name"
-          autocorrect="off"
-        />
+        <input type="text" id="reg-name" placeholder="Your Name" />
         <label>Password</label>
         <input
           type="password"
@@ -1333,16 +1091,15 @@
           placeholder="••••••••"
           autocomplete="new-password"
         />
-        <button type="button" class="btn btn-primary" id="register-btn">
+        <button class="btn btn-primary" onclick="registerUser()">
           Create Account
         </button>
-        <button type="button" class="btn btn-ghost" id="goto-login-btn">
+        <button class="btn btn-ghost" onclick="showLogin()">
           Already have an account →
         </button>
       </div>
     </div>
 
-    <!-- ── APP SCREEN ── -->
     <div id="app-screen" class="screen">
       <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -1356,18 +1113,16 @@
           <div class="sidebar-header-actions">
             <div class="my-number" id="my-number-badge">####</div>
             <button
-              type="button"
               class="account-btn"
+              type="button"
               onclick="openDeleteAccountModal()"
             >
               Delete
             </button>
           </div>
         </div>
-        <div id="notif-banner-container"></div>
         <div class="sidebar-tabs">
           <button
-            type="button"
             class="tab-btn active"
             onclick="switchTab('chats')"
             id="tab-chats"
@@ -1375,20 +1130,11 @@
             Chats
           </button>
           <button
-            type="button"
             class="tab-btn"
             onclick="switchTab('contacts')"
             id="tab-contacts"
           >
             Contacts
-          </button>
-          <button
-            type="button"
-            class="tab-btn"
-            onclick="switchTab('groups')"
-            id="tab-groups"
-          >
-            Groups
           </button>
         </div>
         <div class="sidebar-content" id="sidebar-content">
@@ -1413,19 +1159,12 @@
             Pick a contact from the sidebar to start texting
           </div>
         </div>
+
         <div
           id="active-chat"
           style="display: none; flex-direction: column; height: 100%"
         >
           <div class="chat-header">
-            <button
-              type="button"
-              class="back-btn"
-              id="back-btn"
-              onclick="goBackToSidebar()"
-            >
-              ←
-            </button>
             <div class="avatar" id="chat-avatar">?</div>
             <div class="chat-header-info">
               <div class="chat-contact-name" id="chat-contact-name">—</div>
@@ -1433,7 +1172,9 @@
             </div>
             <div class="online-dot" title="Realtime"></div>
           </div>
+
           <div class="chat-messages" id="chat-messages"></div>
+
           <div class="chat-input-stack">
             <div
               class="attachment-preview"
@@ -1443,10 +1184,10 @@
             <div class="chat-input-area">
               <div class="chat-input-wrap">
                 <button
-                  type="button"
                   class="attach-btn"
                   onclick="openImagePicker()"
                   title="Attach image"
+                  type="button"
                 >
                   <svg
                     width="18"
@@ -1474,7 +1215,7 @@
                   oninput="autoResize(this)"
                 ></textarea>
               </div>
-              <button type="button" class="send-btn" onclick="sendMessage()">
+              <button class="send-btn" onclick="sendMessage()">
                 <svg
                   width="20"
                   height="20"
@@ -1493,7 +1234,6 @@
       </div>
     </div>
 
-    <!-- Add Contact Modal -->
     <div class="modal-overlay" id="add-contact-modal">
       <div class="modal">
         <h3>Add Contact</h3>
@@ -1514,67 +1254,16 @@
           placeholder="Leave blank to use their name"
         />
         <div class="modal-actions">
-          <button
-            type="button"
-            class="btn btn-ghost btn-sm"
-            onclick="closeModal()"
-          >
+          <button class="btn btn-ghost btn-sm" onclick="closeModal()">
             Cancel
           </button>
-          <button
-            type="button"
-            class="btn btn-primary btn-sm"
-            onclick="addContact()"
-          >
+          <button class="btn btn-primary btn-sm" onclick="addContact()">
             Add Contact
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Edit Contact Modal -->
-    <div class="modal-overlay" id="edit-contact-modal">
-      <div class="modal">
-        <h3>Edit Contact</h3>
-        <div class="error-msg" id="edit-contact-error"></div>
-        <div class="edit-contact-note">
-          💡 Update the nickname or number if they switched accounts.
-        </div>
-        <label>Nickname</label>
-        <input
-          type="text"
-          id="edit-contact-nickname"
-          placeholder="Display name (blank = use their real name)"
-        />
-        <label>Their 4-Digit Number</label>
-        <input
-          type="text"
-          id="edit-contact-number"
-          placeholder="1234"
-          maxlength="4"
-          style="font-size: 24px; letter-spacing: 4px; text-align: center"
-          oninput="this.value = this.value.replace(/\D/g, '')"
-        />
-        <div class="modal-actions">
-          <button
-            type="button"
-            class="btn btn-ghost btn-sm"
-            onclick="closeEditContactModal()"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            class="btn btn-primary btn-sm"
-            onclick="saveEditedContact()"
-          >
-            Save Changes
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Edit Message Modal -->
     <div class="modal-overlay" id="edit-message-modal">
       <div class="modal">
         <h3>Edit Message</h3>
@@ -1584,29 +1273,23 @@
           placeholder="Edit message..."
         ></textarea>
         <div class="modal-actions">
-          <button
-            type="button"
-            class="btn btn-ghost btn-sm"
-            onclick="closeEditModal()"
-          >
+          <button class="btn btn-ghost btn-sm" onclick="closeEditModal()">
             Cancel
           </button>
-          <button
-            type="button"
-            class="btn btn-primary btn-sm"
-            onclick="saveEditedMessage()"
-          >
+          <button class="btn btn-primary btn-sm" onclick="saveEditedMessage()">
             Save
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Delete Account Modal -->
     <div class="modal-overlay" id="delete-account-modal">
       <div class="modal">
         <h3>Delete Account</h3>
-        <p>This permanently removes your account and all your data.</p>
+        <p>
+          This permanently removes your account from this device and deletes
+          your profile data from the database.
+        </p>
         <div class="error-msg" id="delete-account-error"></div>
         <label>Type DELETE to confirm</label>
         <input
@@ -1624,57 +1307,18 @@
         />
         <div class="modal-actions">
           <button
-            type="button"
             class="btn btn-ghost btn-sm"
             onclick="closeDeleteAccountModal()"
           >
             Cancel
           </button>
-          <button
-            type="button"
-            class="btn btn-primary btn-sm"
-            onclick="deleteAccount()"
-          >
+          <button class="btn btn-primary btn-sm" onclick="deleteAccount()">
             Delete
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Create Group Modal -->
-    <div class="modal-overlay" id="create-group-modal">
-      <div class="modal">
-        <h3>New Group Chat</h3>
-        <div class="error-msg" id="group-error"></div>
-        <label>Group Name</label>
-        <input
-          type="text"
-          id="group-name"
-          placeholder="e.g. Squad, Family..."
-        />
-        <label>Add Members (from your contacts)</label>
-        <div class="contact-select-list" id="group-contact-list"></div>
-        <div class="member-chips" id="group-member-chips"></div>
-        <div class="modal-actions">
-          <button
-            type="button"
-            class="btn btn-ghost btn-sm"
-            onclick="closeCreateGroupModal()"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            class="btn btn-primary btn-sm"
-            onclick="createGroup()"
-          >
-            Create Group
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Image Lightbox -->
     <div class="modal-overlay" id="image-modal">
       <div
         class="modal"
@@ -1695,6 +1339,7 @@
     </div>
 
     <input type="file" id="image-input" accept="image/*" hidden />
+
     <div class="toast" id="toast"></div>
 
     <script type="module">
@@ -1729,7 +1374,6 @@
       let currentUser = null;
       let contacts = {};
       let activeConvo = null;
-      let activeConvoType = "dm";
       let activeTab = "chats";
       let convoListeners = {};
       let unreadCounts = {};
@@ -1738,55 +1382,14 @@
       let currentMessages = {};
       let deleteQueue = Promise.resolve();
       let deleteInProgress = false;
-      let editingMessage = { key: null, cid: null, data: null };
-      let editingContactNumber = null;
-      let groups = {};
-      let inbox = {};
-      let notifPermission = Notification.permission;
-      let isMobile = () => window.innerWidth <= 640;
+      let editingMessage = {
+        key: null,
+        cid: null,
+        data: null,
+      };
 
       const $ = (id) => document.getElementById(id);
 
-      // ── Mobile navigation ──────────────────────────────────────────────────
-      window.goBackToSidebar = function () {
-        if (!isMobile()) return;
-        $("chat-panel").classList.remove("mobile-open");
-        $("sidebar").classList.remove("mobile-hidden");
-        activeConvo = null;
-        renderSidebar();
-      };
-
-      function openMobileChat() {
-        if (!isMobile()) return;
-        $("sidebar").classList.add("mobile-hidden");
-        $("chat-panel").classList.add("mobile-open");
-      }
-
-      // ── Notifications ──────────────────────────────────────────────────────
-      function showNotifBanner() {
-        const c = $("notif-banner-container");
-        if (notifPermission === "granted" || notifPermission === "denied") {
-          c.innerHTML = "";
-          return;
-        }
-        c.innerHTML = `<div class="notif-banner"><span>🔔 Enable notifications for new messages</span><button type="button" onclick="requestNotifPermission()">Enable</button></div>`;
-      }
-
-      window.requestNotifPermission = async function () {
-        notifPermission = await Notification.requestPermission();
-        showNotifBanner();
-        if (notifPermission === "granted") showToast("Notifications enabled!");
-      };
-
-      function fireNotification(title, body, tag) {
-        if (notifPermission !== "granted") return;
-        if (document.hasFocus()) return;
-        try {
-          new Notification(title, { body, icon: "", tag, silent: true });
-        } catch (e) {}
-      }
-
-      // ── Utility ────────────────────────────────────────────────────────────
       function showToast(msg) {
         const t = $("toast");
         t.textContent = msg;
@@ -1796,8 +1399,9 @@
 
       function hashPassword(pw) {
         let h = 0;
-        for (let i = 0; i < pw.length; i++)
+        for (let i = 0; i < pw.length; i++) {
           h = (Math.imul(31, h) + pw.charCodeAt(i)) | 0;
+        }
         return h.toString(36);
       }
 
@@ -1807,8 +1411,8 @@
 
       function timeStr(ts) {
         if (!ts) return "";
-        const d = new Date(ts),
-          now = new Date();
+        const d = new Date(ts);
+        const now = new Date();
         const diffDays = Math.floor((now - d) / 86400000);
         if (diffDays === 0)
           return d.toLocaleTimeString([], {
@@ -1831,8 +1435,9 @@
       async function assignNumber() {
         const taken = new Set();
         const snap = await get(dbRef(db, "users"));
-        if (snap.exists())
+        if (snap.exists()) {
           Object.values(snap.val()).forEach((u) => taken.add(u.number));
+        }
         let num;
         do {
           num = String(Math.floor(1000 + Math.random() * 9000));
@@ -1848,6 +1453,7 @@
           .replace(/"/g, "&quot;")
           .replace(/'/g, "&#39;");
       }
+
       function escapeAttr(str = "") {
         return escapeHtml(str).replace(/`/g, "&#96;");
       }
@@ -1861,7 +1467,8 @@
 
       function renderTextWithLinks(text) {
         const safe = escapeHtml(text || "");
-        return safe.replace(/(https?:\/\/[^\s<>"')\]]+)/gi, (raw) => {
+        const urlRegex = /(https?:\/\/[^\s<>"')\]]+)/gi;
+        return safe.replace(urlRegex, (raw) => {
           const clean = raw.replace(/[.,!?;:]+$/g, "");
           const trailing = raw.slice(clean.length);
           return `<a href="${escapeAttr(clean)}" target="_blank" rel="noopener noreferrer" class="message-link">${escapeHtml(clean)}</a>${escapeHtml(trailing)}`;
@@ -1878,9 +1485,8 @@
 
       async function fetchLinkPreview(url) {
         try {
-          const res = await fetch(
-            `https://api.microlink.io/?url=${encodeURIComponent(url)}`,
-          );
+          const endpoint = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
+          const res = await fetch(endpoint, { method: "GET" });
           const json = await res.json();
           const data = json?.data || {};
           return {
@@ -1909,7 +1515,16 @@
         const img = preview.image
           ? `<img src="${escapeAttr(preview.image)}" alt="" class="link-preview-image">`
           : "";
-        return `<div class="link-preview">${img}<div class="link-preview-body"><div class="link-preview-domain">${site}</div><div class="link-preview-title">${title}</div>${desc ? `<div class="link-preview-desc">${desc}</div>` : ""}</div></div>`;
+        return `
+          <div class="link-preview">
+            ${img}
+            <div class="link-preview-body">
+              <div class="link-preview-domain">${site}</div>
+              <div class="link-preview-title">${title}</div>
+              ${desc ? `<div class="link-preview-desc">${desc}</div>` : ""}
+            </div>
+          </div>
+        `;
       }
 
       function clearAttachment() {
@@ -1928,30 +1543,43 @@
         holder.style.display = "block";
         const objectUrl = URL.createObjectURL(file);
         selectedImagePreviewUrl = objectUrl;
-        holder.innerHTML = `<div class="attachment-chip"><img src="${escapeAttr(objectUrl)}" class="attachment-thumb" alt="selected image"><div class="attachment-meta"><div class="attachment-name">${escapeHtml(file.name)}</div><div class="attachment-sub">${escapeHtml(Math.round(file.size / 1024))} KB</div></div><button type="button" class="attachment-remove" onclick="removeSelectedImage()">×</button></div>`;
+        holder.innerHTML = `
+          <div class="attachment-chip">
+            <img src="${escapeAttr(objectUrl)}" class="attachment-thumb" alt="selected image">
+            <div class="attachment-meta">
+              <div class="attachment-name">${escapeHtml(file.name)}</div>
+              <div class="attachment-sub">${escapeHtml(Math.round(file.size / 1024))} KB</div>
+            </div>
+            <button class="attachment-remove" type="button" onclick="removeSelectedImage()">×</button>
+          </div>
+        `;
       }
 
-      window.removeSelectedImage = () => clearAttachment();
-      window.openImagePicker = () => $("image-input").click();
+      window.removeSelectedImage = function () {
+        clearAttachment();
+      };
+
+      window.openImagePicker = function () {
+        $("image-input").click();
+      };
 
       $("image-input").addEventListener("change", (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
         if (!file.type.startsWith("image/")) {
-          showToast("Please choose an image file.");
+          showToast("please choose an image file.");
           return;
         }
         selectedImageFile = file;
         showAttachmentPreview(file);
       });
 
-      // ── Auth ───────────────────────────────────────────────────────────────
-
-      async function doRegister() {
+      window.registerUser = async function () {
         const username = $("reg-username").value.trim().toLowerCase();
         const name = $("reg-name").value.trim();
         const password = $("reg-password").value;
         const errEl = $("reg-error");
+
         if (!username || !name || !password) {
           errEl.textContent = "All fields required.";
           return;
@@ -1964,12 +1592,15 @@
           errEl.textContent = "Password must be 4+ characters.";
           return;
         }
+
         errEl.textContent = "";
+
         const snap = await get(dbRef(db, `users/${username}`));
         if (snap.exists()) {
           errEl.textContent = "Username already taken.";
           return;
         }
+
         const number = await assignNumber();
         const userData = {
           username,
@@ -1977,35 +1608,36 @@
           number,
           passwordHash: hashPassword(password),
         };
+
         await set(dbRef(db, `users/${username}`), userData);
         await loginSuccess(userData);
-      }
+      };
 
-      async function doLogin() {
+      window.loginUser = async function () {
         const username = $("login-username").value.trim().toLowerCase();
         const password = $("login-password").value;
         const errEl = $("login-error");
+
         if (!username || !password) {
           errEl.textContent = "Enter username & password.";
           return;
         }
         errEl.textContent = "";
+
         const snap = await get(dbRef(db, `users/${username}`));
         if (!snap.exists()) {
           errEl.textContent = "User not found.";
           return;
         }
+
         const data = snap.val();
         if (data.passwordHash !== hashPassword(password)) {
           errEl.textContent = "Wrong password.";
           return;
         }
-        await loginSuccess(data);
-      }
 
-      // Expose for legacy onclick compatibility
-      window.loginUser = doLogin;
-      window.registerUser = doRegister;
+        await loginSuccess(data);
+      };
 
       async function loginSuccess(userData) {
         currentUser = userData;
@@ -2018,87 +1650,10 @@
         $("app-screen").classList.add("active");
         $("my-number-badge").textContent = "#" + currentUser.number;
         $("user-display-name").textContent = currentUser.name;
-        showNotifBanner();
         loadContacts();
-        loadGroups();
         listenForIncoming();
       }
 
-      window.showRegister = function () {
-        $("login-card").style.display = "none";
-        $("register-card").style.display = "block";
-      };
-      window.showLogin = function () {
-        $("register-card").style.display = "none";
-        $("login-card").style.display = "block";
-      };
-
-      // ── Robust button wiring (works on all devices) ────────────────────────
-      // Called after DOM is ready — attaches click AND touchend to each button.
-      function wireButton(el, fn) {
-        if (!el) return;
-        let touchFired = false;
-        el.addEventListener(
-          "touchend",
-          (e) => {
-            e.preventDefault(); // prevent ghost click on iOS
-            touchFired = true;
-            fn();
-            setTimeout(() => {
-              touchFired = false;
-            }, 600);
-          },
-          { passive: false },
-        );
-        el.addEventListener("click", () => {
-          if (touchFired) return; // already handled by touchend
-          fn();
-        });
-      }
-
-      function attachAllButtons() {
-        wireButton($("sign-in-btn"), doLogin);
-        wireButton($("register-btn"), doRegister);
-        wireButton($("goto-register-btn"), window.showRegister);
-        wireButton($("goto-login-btn"), window.showLogin);
-
-        // Allow Enter key in password field to trigger login
-        const loginPw = $("login-password");
-        if (loginPw) {
-          loginPw.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              doLogin();
-            }
-          });
-        }
-        const loginUser = $("login-username");
-        if (loginUser) {
-          loginUser.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              $("login-password").focus();
-            }
-          });
-        }
-        const regPw = $("reg-password");
-        if (regPw) {
-          regPw.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              doRegister();
-            }
-          });
-        }
-      }
-
-      // Wire immediately + on DOMContentLoaded as fallback
-      attachAllButtons();
-      if (document.readyState !== "complete") {
-        document.addEventListener("DOMContentLoaded", attachAllButtons);
-      }
-
-      // ── Contacts ──────────────────────────────────────────────────────────
       async function loadContacts() {
         const snap = await get(dbRef(db, `contacts/${currentUser.username}`));
         contacts = {};
@@ -2106,298 +1661,80 @@
         renderSidebar();
       }
 
-      async function loadGroups() {
-        const snap = await get(dbRef(db, "groups"));
-        groups = {};
-        if (snap.exists()) {
-          Object.entries(snap.val()).forEach(([gid, g]) => {
-            if (g.members && g.members.includes(currentUser.number))
-              groups[gid] = g;
-          });
-        }
-        onValue(dbRef(db, "groups"), (snap) => {
-          groups = {};
-          if (snap.exists()) {
-            Object.entries(snap.val()).forEach(([gid, g]) => {
-              if (g.members && g.members.includes(currentUser.number))
-                groups[gid] = g;
-            });
-          }
-          renderSidebar();
-        });
-      }
-
       function listenForIncoming() {
-        onValue(dbRef(db, "convos"), async (snap) => {
+        onValue(dbRef(db, "convos"), (snap) => {
           if (!snap.exists()) return;
           const all = snap.val();
-          const newInbox = {};
-          for (const [cid, msgs] of Object.entries(all)) {
-            if (!cid.includes(currentUser.number)) continue;
+
+          Object.entries(all).forEach(([cid, msgs]) => {
+            if (!cid.includes(currentUser.number)) return;
+            let unread = 0;
+            Object.values(msgs).forEach((m) => {
+              if (m.from !== currentUser.number && !m.read) unread++;
+            });
             const otherNum = cid
               .split("_")
               .find((n) => n !== currentUser.number);
-            if (!otherNum) continue;
-            let unread = 0,
-              lastMsg = null,
-              lastTs = 0;
-            Object.values(msgs).forEach((m) => {
-              if (m.from !== currentUser.number && !m.read) unread++;
-              if ((m.ts || 0) > lastTs) {
-                lastTs = m.ts || 0;
-                lastMsg = m;
-              }
-            });
-            const isKnown = !!contacts[otherNum];
-            if (!isKnown) {
-              let senderName = otherNum;
-              try {
-                const usersSnap = await get(dbRef(db, "users"));
-                if (usersSnap.exists())
-                  Object.values(usersSnap.val()).forEach((u) => {
-                    if (u.number === otherNum) senderName = u.name;
-                  });
-              } catch (e) {}
-              newInbox[otherNum] = {
-                number: otherNum,
-                name: senderName,
-                unread,
-                lastMsg,
-                lastTs,
-              };
-            }
-            if (isKnown) unreadCounts[otherNum] = unread;
-            if (unread > 0 && lastMsg && lastMsg.from !== currentUser.number) {
-              const senderLabel = isKnown
-                ? contacts[otherNum].nickname || contacts[otherNum].name
-                : `#${otherNum}`;
-              const bodyText =
-                lastMsg.type === "image" ? "📷 Image" : lastMsg.text || "";
-              if (activeConvo !== otherNum)
-                fireNotification(
-                  `PocketText from ${senderLabel}`,
-                  bodyText,
-                  `msg-${otherNum}`,
-                );
-            }
-          }
-          inbox = newInbox;
-          renderSidebar();
-        });
-
-        onValue(dbRef(db, "groupMsgs"), (snap) => {
-          if (!snap.exists()) return;
-          Object.entries(snap.val()).forEach(([gid, msgs]) => {
-            if (!groups[gid]) return;
-            let unread = 0,
-              lastMsg = null,
-              lastTs = 0;
-            Object.values(msgs).forEach((m) => {
-              if (m.from !== currentUser.number && !m.read) unread++;
-              if ((m.ts || 0) > lastTs) {
-                lastTs = m.ts || 0;
-                lastMsg = m;
-              }
-            });
-            unreadCounts[`group_${gid}`] = unread;
-            if (
-              unread > 0 &&
-              lastMsg &&
-              lastMsg.from !== currentUser.number &&
-              activeConvo !== gid
-            ) {
-              const g = groups[gid];
-              fireNotification(
-                `PocketText: ${g ? g.name : "Group"}`,
-                lastMsg.text || "📷 Image",
-                `group-${gid}`,
-              );
-            }
+            unreadCounts[otherNum] = unread;
           });
+
           renderSidebar();
         });
       }
 
-      // ── Sidebar Render ─────────────────────────────────────────────────────
       function renderSidebar() {
         const el = $("sidebar-content");
-        if (activeTab === "chats" || activeTab === "contacts") {
+
+        if (activeTab === "chats") {
           const contactList = Object.values(contacts);
-          let html = "";
-          if (activeTab === "chats") {
-            if (contactList.length === 0 && Object.keys(inbox).length === 0) {
-              html = `<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">No chats yet.<br>Add someone to start texting!</div>`;
-            }
-            html += contactList
+          if (contactList.length === 0) {
+            el.innerHTML = `<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">No contacts yet.<br>Add someone to start texting!</div>`;
+          } else {
+            el.innerHTML = contactList
               .map((c) => {
                 const unread = unreadCounts[c.number] || 0;
                 const displayName = c.nickname || c.name;
-                return `<div class="contact-item ${activeConvo === c.number && activeConvoType === "dm" ? "active" : ""}" onclick="openChat('${c.number}','dm')">
-                <div class="avatar">${getInitials(displayName)}</div>
-                <div class="contact-info">
-                  <div class="contact-name">${escapeHtml(displayName)}</div>
-                  <div class="contact-preview">#${escapeHtml(c.number)}</div>
-                </div>
-                ${unread > 0 ? `<div class="unread-badge">${unread}</div>` : ""}
-                <button type="button" class="edit-contact-btn" title="Edit contact" onclick="event.stopPropagation();openEditContact('${escapeAttr(c.number)}')">✏️</button>
-              </div>`;
+                return `
+                  <div class="contact-item ${activeConvo === c.number ? "active" : ""}" onclick="openChat('${c.number}')">
+                    <div class="avatar">${getInitials(displayName)}</div>
+                    <div class="contact-info">
+                      <div class="contact-name">${escapeHtml(displayName)}</div>
+                      <div class="contact-preview">#${escapeHtml(c.number)}</div>
+                    </div>
+                    ${unread > 0 ? `<div class="unread-badge">${unread}</div>` : ""}
+                  </div>`;
               })
               .join("");
-            const inboxList = Object.values(inbox);
-            if (inboxList.length > 0) {
-              html += `<div class="inbox-section-label">📥 Inbox</div>`;
-              html += inboxList
-                .map((i) => {
-                  const preview = i.lastMsg
-                    ? i.lastMsg.type === "image"
-                      ? "📷 Image"
-                      : i.lastMsg.text || ""
-                    : "";
-                  return `<div class="contact-item unknown ${activeConvo === i.number && activeConvoType === "dm" ? "active" : ""}" onclick="openChat('${i.number}','dm')">
-                  <div class="avatar">?</div>
-                  <div class="contact-info">
-                    <div class="contact-name">${escapeHtml(i.name)} <span style="font-size:10px;opacity:0.6">(unknown)</span></div>
-                    <div class="contact-preview">${escapeHtml(preview)}</div>
-                  </div>
-                  ${i.unread > 0 ? `<div class="unread-badge">${i.unread}</div>` : ""}
-                </div>`;
-                })
-                .join("");
-            }
+          }
+          el.innerHTML += `<button class="add-contact-btn" onclick="openAddContact()">+ Add Contact</button>`;
+        } else {
+          const contactList = Object.values(contacts);
+          if (contactList.length === 0) {
+            el.innerHTML = `<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">No contacts yet.</div>`;
           } else {
-            if (contactList.length === 0) {
-              html = `<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">No contacts yet.</div>`;
-            }
-            html += contactList
+            el.innerHTML = contactList
               .map((c) => {
                 const displayName = c.nickname || c.name;
-                return `<div class="contact-item" onclick="openChat('${c.number}','dm')">
-                <div class="avatar">${getInitials(displayName)}</div>
-                <div class="contact-info">
-                  <div class="contact-name">${escapeHtml(displayName)}</div>
-                  <div class="contact-num">#${escapeHtml(c.number)}</div>
-                </div>
-                <button type="button" class="edit-contact-btn" title="Edit contact" onclick="event.stopPropagation();openEditContact('${escapeAttr(c.number)}')">✏️</button>
-              </div>`;
+                return `
+                  <div class="contact-item" onclick="openChat('${c.number}')">
+                    <div class="avatar">${getInitials(displayName)}</div>
+                    <div class="contact-info">
+                      <div class="contact-name">${escapeHtml(displayName)}</div>
+                      <div class="contact-num">#${escapeHtml(c.number)}</div>
+                    </div>
+                  </div>`;
               })
               .join("");
           }
-          html += `<button type="button" class="add-contact-btn" onclick="openAddContact()">+ Add Contact</button>`;
-          el.innerHTML = html;
-        } else if (activeTab === "groups") {
-          const groupList = Object.entries(groups);
-          let html = "";
-          if (groupList.length === 0) {
-            html = `<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">No group chats yet.</div>`;
-          }
-          html += groupList
-            .map(([gid, g]) => {
-              const unread = unreadCounts[`group_${gid}`] || 0;
-              const memberCount = g.members ? g.members.length : 0;
-              return `<div class="contact-item ${activeConvo === gid && activeConvoType === "group" ? "active" : ""}" onclick="openChat('${gid}','group')">
-              <div class="avatar group-avatar">👥</div>
-              <div class="contact-info">
-                <div class="contact-name">${escapeHtml(g.name)}</div>
-                <div class="contact-preview">${memberCount} members</div>
-              </div>
-              ${unread > 0 ? `<div class="unread-badge">${unread}</div>` : ""}
-            </div>`;
-            })
-            .join("");
-          html += `<button type="button" class="add-contact-btn" onclick="openCreateGroupModal()">+ New Group Chat</button>`;
-          el.innerHTML = html;
+          el.innerHTML += `<button class="add-contact-btn" onclick="openAddContact()">+ Add Contact</button>`;
         }
       }
 
-      // ── Edit Contact ───────────────────────────────────────────────────────
-      window.openEditContact = function (oldNumber) {
-        const contact = contacts[oldNumber];
-        if (!contact) return;
-        editingContactNumber = oldNumber;
-        $("edit-contact-error").textContent = "";
-        $("edit-contact-nickname").value = contact.nickname || "";
-        $("edit-contact-number").value = contact.number;
-        $("edit-contact-modal").classList.add("open");
-      };
-
-      window.closeEditContactModal = function () {
-        $("edit-contact-modal").classList.remove("open");
-        $("edit-contact-error").textContent = "";
-        editingContactNumber = null;
-      };
-
-      window.saveEditedContact = async function () {
-        const err = $("edit-contact-error");
-        const newNickname = $("edit-contact-nickname").value.trim();
-        const newNumber = $("edit-contact-number").value.trim();
-        if (!editingContactNumber) {
-          err.textContent = "No contact selected.";
-          return;
-        }
-        if (newNumber.length !== 4) {
-          err.textContent = "Enter a valid 4-digit number.";
-          return;
-        }
-        if (newNumber === currentUser.number) {
-          err.textContent = "That's your own number!";
-          return;
-        }
-        const oldContact = contacts[editingContactNumber];
-        let resolvedName = oldContact.name;
-        if (newNumber !== editingContactNumber) {
-          const snap = await get(dbRef(db, "users"));
-          if (!snap.exists()) {
-            err.textContent = "No users found.";
-            return;
-          }
-          let found = null;
-          Object.values(snap.val()).forEach((u) => {
-            if (u.number === newNumber) found = u;
-          });
-          if (!found) {
-            err.textContent = "No user with that number.";
-            return;
-          }
-          resolvedName = found.name;
-          await remove(
-            dbRef(
-              db,
-              `contacts/${currentUser.username}/${editingContactNumber}`,
-            ),
-          );
-          delete contacts[editingContactNumber];
-          if (activeConvo === editingContactNumber) {
-            activeConvo = null;
-            $("empty-state").style.display = "";
-            $("active-chat").style.display = "none";
-          }
-        }
-        const updatedContact = {
-          number: newNumber,
-          name: resolvedName,
-          nickname: newNickname,
-        };
-        await set(
-          dbRef(db, `contacts/${currentUser.username}/${newNumber}`),
-          updatedContact,
-        );
-        contacts[newNumber] = updatedContact;
-        closeEditContactModal();
-        showToast("Contact updated!");
-        renderSidebar();
-        if (activeConvo === newNumber) {
-          const displayName = newNickname || resolvedName;
-          $("chat-contact-name").textContent = displayName;
-          $("chat-contact-num").textContent = "#" + newNumber;
-          $("chat-avatar").textContent = getInitials(displayName);
-        }
-      };
-
-      // ── Add Contact ────────────────────────────────────────────────────────
       window.addContact = async function () {
         const num = $("contact-number").value.trim();
         const nick = $("contact-nickname").value.trim();
         const errEl = $("contact-error");
+
         if (num.length !== 4) {
           errEl.textContent = "Enter a valid 4-digit number.";
           return;
@@ -2406,117 +1743,81 @@
           errEl.textContent = "That's your own number!";
           return;
         }
+
         const snap = await get(dbRef(db, "users"));
         if (!snap.exists()) {
           errEl.textContent = "No users found.";
           return;
         }
+
         let found = null;
         Object.values(snap.val()).forEach((u) => {
           if (u.number === num) found = u;
         });
+
         if (!found) {
           errEl.textContent = "No user with that number.";
           return;
         }
+
         contacts[num] = { number: num, name: found.name, nickname: nick || "" };
         await set(
           dbRef(db, `contacts/${currentUser.username}/${num}`),
           contacts[num],
         );
+
         closeModal();
         showToast(`${nick || found.name} added!`);
         renderSidebar();
       };
 
-      // ── Open Chat ──────────────────────────────────────────────────────────
-      window.openChat = async function (id, type = "dm") {
-        activeConvo = id;
-        activeConvoType = type;
+      window.openChat = async function (num) {
+        activeConvo = num;
+        const contact = contacts[num];
+        if (!contact) return;
 
-        if (type === "dm") {
-          const contact = contacts[id] || inbox[id];
-          if (!contact) return;
-          const displayName = contact.nickname || contact.name || `#${id}`;
-          $("empty-state").style.display = "none";
-          $("active-chat").style.display = "flex";
-          $("chat-avatar").textContent = getInitials(displayName);
-          $("chat-avatar").className = "avatar";
-          $("chat-contact-name").textContent = displayName;
-          $("chat-contact-num").textContent = "#" + contact.number;
-        } else {
-          const g = groups[id];
-          if (!g) return;
-          $("empty-state").style.display = "none";
-          $("active-chat").style.display = "flex";
-          $("chat-avatar").textContent = "👥";
-          $("chat-avatar").className = "avatar group-avatar";
-          $("chat-contact-name").textContent = g.name;
-          $("chat-contact-num").textContent =
-            `${g.members ? g.members.length : 0} members`;
-        }
+        const displayName = contact.nickname || contact.name;
+        $("empty-state").style.display = "none";
+        $("active-chat").style.display = "flex";
+        $("chat-avatar").textContent = getInitials(displayName);
+        $("chat-contact-name").textContent = displayName;
+        $("chat-contact-num").textContent = "#" + contact.number;
 
-        openMobileChat();
         renderSidebar();
 
-        if (convoListeners[id]) convoListeners[id]();
+        if (convoListeners[num]) convoListeners[num]();
 
-        if (type === "dm") {
-          const cid = convoId(currentUser.number, id);
-          convoListeners[id] = onValue(
-            dbRef(db, `convos/${cid}`),
-            async (snap) => {
-              const msgs = snap.exists() ? snap.val() : {};
-              renderMessages(msgs, type);
-              const updates = {};
-              Object.entries(msgs).forEach(([k, m]) => {
-                if (m.from !== currentUser.number && !m.read)
-                  updates[`convos/${cid}/${k}/read`] = true;
-              });
-              if (Object.keys(updates).length > 0) {
-                await update(dbRef(db), updates);
-                unreadCounts[id] = 0;
-                renderSidebar();
+        const cid = convoId(currentUser.number, num);
+
+        convoListeners[num] = onValue(
+          dbRef(db, `convos/${cid}`),
+          async (snap) => {
+            const msgs = snap.exists() ? snap.val() : {};
+            renderMessages(msgs);
+
+            const updates = {};
+            Object.entries(msgs).forEach(([k, m]) => {
+              if (m.from !== currentUser.number && !m.read) {
+                updates[`convos/${cid}/${k}/read`] = true;
               }
-            },
-          );
-        } else {
-          convoListeners[id] = onValue(
-            dbRef(db, `groupMsgs/${id}`),
-            async (snap) => {
-              const msgs = snap.exists() ? snap.val() : {};
-              renderMessages(msgs, type);
-              const updates = {};
-              Object.entries(msgs).forEach(([k, m]) => {
-                if (m.from !== currentUser.number && !m.read)
-                  updates[`groupMsgs/${id}/${k}/read`] = true;
-              });
-              if (Object.keys(updates).length > 0) {
-                await update(dbRef(db), updates);
-                unreadCounts[`group_${id}`] = 0;
-                renderSidebar();
-              }
-            },
-          );
-        }
+            });
+
+            if (Object.keys(updates).length > 0) {
+              await update(dbRef(db), updates);
+              unreadCounts[num] = 0;
+              renderSidebar();
+            }
+          },
+        );
       };
 
-      // ── Render Messages ────────────────────────────────────────────────────
-      function getSenderName(fromNum) {
-        if (fromNum === currentUser.number) return "You";
-        if (contacts[fromNum])
-          return contacts[fromNum].nickname || contacts[fromNum].name;
-        return `#${fromNum}`;
-      }
-
-      function renderMessages(msgs, type = "dm") {
+      function renderMessages(msgs) {
         const el = $("chat-messages");
         currentMessages = msgs || {};
         const sorted = Object.entries(currentMessages).sort(
           (a, b) => (a[1].ts || 0) - (b[1].ts || 0),
         );
         let lastDate = "";
-        const isGroup = type === "group";
 
         el.innerHTML = sorted
           .map(([key, m]) => {
@@ -2538,48 +1839,56 @@
             }
 
             let contentHtml = "";
-            if (isGroup && !out)
-              contentHtml += `<div class="msg-sender">${escapeHtml(getSenderName(m.from))}</div>`;
 
             if (m.type === "image" && m.imageUrl) {
               contentHtml += `<img src="${escapeAttr(m.imageUrl)}" alt="sent image" class="image-message" onclick="openImageLightbox('${escapeAttr(m.imageUrl)}')">`;
-              if (m.caption)
+              if (m.caption) {
                 contentHtml += `<div class="caption-spacer"></div><div class="message-text">${renderTextWithLinks(m.caption)}</div>`;
+              }
             } else {
-              if (m.text)
+              if (m.text) {
                 contentHtml += `<div class="message-text">${renderTextWithLinks(m.text)}</div>`;
+              }
             }
-            if (m.linkPreview && m.linkPreview.url)
+
+            if (m.linkPreview && m.linkPreview.url) {
               contentHtml += renderLinkPreview(m.linkPreview);
+            }
 
             const actions = out
-              ? `<div class="message-actions">
-            <button type="button" class="message-action-btn" onclick="editMessage('${key}')">Edit</button>
-            <button type="button" class="message-action-btn" onclick="deleteMessage('${key}')">Delete</button>
-          </div>`
+              ? `
+                <div class="message-actions">
+                  <button class="message-action-btn" type="button" onclick="editMessage('${key}')">Edit</button>
+                  <button class="message-action-btn" type="button" onclick="deleteMessage('${key}')">Delete</button>
+                </div>
+              `
               : "";
 
             return `${divider}
-          <div class="msg-row ${out ? "outgoing" : "incoming"}" data-key="${escapeAttr(key)}">
-            <div class="bubble">${contentHtml || "&nbsp;"}${actions}</div>
-            <div class="msg-time">${escapeHtml(timeStr(m.ts))}</div>
-          </div>`;
+              <div class="msg-row ${out ? "outgoing" : "incoming"}" data-key="${escapeAttr(key)}">
+                <div class="bubble">
+                  ${contentHtml || "&nbsp;"}
+                  ${actions}
+                </div>
+                <div class="msg-time">${escapeHtml(timeStr(m.ts))}</div>
+              </div>`;
           })
           .join("");
 
         el.scrollTop = el.scrollHeight;
       }
 
-      // ── Edit / Delete Message ──────────────────────────────────────────────
       window.editMessage = function (key) {
         if (!activeConvo) return;
         const msg = currentMessages[key];
         if (!msg || msg.from !== currentUser.number) return;
-        const cid =
-          activeConvoType === "group"
-            ? `groupMsgs/${activeConvo}`
-            : `convos/${convoId(currentUser.number, activeConvo)}`;
-        editingMessage = { key, cid, data: { ...msg } };
+
+        editingMessage = {
+          key,
+          cid: convoId(currentUser.number, activeConvo),
+          data: { ...msg },
+        };
+
         $("edit-message-error").textContent = "";
         $("edit-message-text").value =
           msg.type === "image" ? msg.caption || "" : msg.text || "";
@@ -2596,6 +1905,7 @@
       window.saveEditedMessage = async function () {
         const err = $("edit-message-error");
         const nextText = $("edit-message-text").value.trim();
+
         if (
           !editingMessage.key ||
           !editingMessage.cid ||
@@ -2604,13 +1914,21 @@
           err.textContent = "No message selected.";
           return;
         }
+
         const base = { ...editingMessage.data };
+
         if (base.type === "image") {
-          if (nextText) base.caption = nextText;
-          else delete base.caption;
+          if (nextText) {
+            base.caption = nextText;
+          } else {
+            delete base.caption;
+          }
           const firstUrl = extractFirstUrl(nextText);
-          if (firstUrl) base.linkPreview = await fetchLinkPreview(firstUrl);
-          else delete base.linkPreview;
+          if (firstUrl) {
+            base.linkPreview = await fetchLinkPreview(firstUrl);
+          } else {
+            delete base.linkPreview;
+          }
         } else {
           if (!nextText) {
             err.textContent = "Message text cannot be empty.";
@@ -2618,15 +1936,20 @@
           }
           base.text = nextText;
           const firstUrl = extractFirstUrl(nextText);
-          if (firstUrl) base.linkPreview = await fetchLinkPreview(firstUrl);
-          else delete base.linkPreview;
+          if (firstUrl) {
+            base.linkPreview = await fetchLinkPreview(firstUrl);
+          } else {
+            delete base.linkPreview;
+          }
         }
+
         await set(
-          dbRef(db, `${editingMessage.cid}/${editingMessage.key}`),
+          dbRef(db, `convos/${editingMessage.cid}/${editingMessage.key}`),
           base,
         );
+
         closeEditModal();
-        showToast("Message updated");
+        showToast("message updated");
       };
 
       window.deleteMessage = function (key) {
@@ -2634,39 +1957,42 @@
           .then(() => deleteMessageQueued(key))
           .catch((err) => {
             console.error(err);
-            showToast("Delete failed");
+            showToast("delete failed");
           });
       };
 
       async function deleteMessageQueued(key) {
         if (deleteInProgress) return;
         if (!activeConvo) return;
+
         const msg = currentMessages[key];
         if (!msg || msg.from !== currentUser.number) return;
+
         const ok = confirm("Delete this message?");
         if (!ok) return;
+
         deleteInProgress = true;
+
         try {
-          const cid =
-            activeConvoType === "group"
-              ? `groupMsgs/${activeConvo}`
-              : `convos/${convoId(currentUser.number, activeConvo)}`;
-          await remove(dbRef(db, `${cid}/${key}`));
-          showToast("Message deleted");
+          const cid = convoId(currentUser.number, activeConvo);
+          await remove(dbRef(db, `convos/${cid}/${key}`));
+          showToast("message deleted");
         } catch (err) {
           console.error(err);
-          showToast("Delete failed");
+          showToast("delete failed");
         } finally {
           deleteInProgress = false;
         }
       }
 
-      // ── Send Message ───────────────────────────────────────────────────────
-      async function uploadSelectedImage() {
+      async function uploadSelectedImage(cid) {
         if (!selectedImageFile) return null;
+
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target.result);
+          reader.onload = function (e) {
+            resolve(e.target.result);
+          };
           reader.onerror = reject;
           reader.readAsDataURL(selectedImageFile);
         });
@@ -2675,20 +2001,25 @@
       window.sendMessage = async function () {
         const input = $("message-input");
         const text = input.value.trim();
-        if (!activeConvo) return;
+
+        if (!activeConvo && !selectedImageFile) return;
         if (!text && !selectedImageFile) return;
+
+        const cid = convoId(currentUser.number, activeConvo);
 
         let linkPreview = null;
         const firstUrl = extractFirstUrl(text);
-        if (firstUrl) linkPreview = await fetchLinkPreview(firstUrl);
+        if (firstUrl) {
+          linkPreview = await fetchLinkPreview(firstUrl);
+        }
 
         let imageUrl = null;
         if (selectedImageFile) {
           try {
-            imageUrl = await uploadSelectedImage();
+            imageUrl = await uploadSelectedImage(cid);
           } catch (err) {
             console.error(err);
-            showToast("Image upload failed.");
+            showToast("image upload failed.");
             return;
           }
         }
@@ -2698,6 +2029,7 @@
           ts: Date.now(),
           read: false,
         };
+
         if (imageUrl) {
           message.type = "image";
           message.imageUrl = imageUrl;
@@ -2709,96 +2041,13 @@
           if (linkPreview) message.linkPreview = linkPreview;
         }
 
-        const path =
-          activeConvoType === "group"
-            ? `groupMsgs/${activeConvo}`
-            : `convos/${convoId(currentUser.number, activeConvo)}`;
-        await push(dbRef(db, path), message);
+        await push(dbRef(db, `convos/${cid}`), message);
+
         input.value = "";
         input.style.height = "auto";
         clearAttachment();
       };
 
-      // ── Group Chat ─────────────────────────────────────────────────────────
-      window.openCreateGroupModal = function () {
-        $("group-name").value = "";
-        $("group-error").textContent = "";
-        $("group-member-chips").innerHTML = "";
-        const list = $("group-contact-list");
-        const contactArr = Object.values(contacts);
-        if (contactArr.length === 0) {
-          list.innerHTML = `<div style="padding:12px;color:var(--muted);font-size:13px">No contacts to add. Add contacts first!</div>`;
-        } else {
-          list.innerHTML = contactArr
-            .map((c) => {
-              const dn = c.nickname || c.name;
-              return `<label class="contact-select-item">
-              <input type="checkbox" value="${escapeAttr(c.number)}" data-name="${escapeAttr(dn)}" onchange="updateGroupChips()">
-              <div class="avatar" style="width:30px;height:30px;font-size:12px">${getInitials(dn)}</div>
-              <span>${escapeHtml(dn)} <span style="color:var(--muted);font-family:'DM Mono',monospace">#${escapeHtml(c.number)}</span></span>
-            </label>`;
-            })
-            .join("");
-        }
-        $("create-group-modal").classList.add("open");
-      };
-
-      window.updateGroupChips = function () {
-        const checked = Array.from(
-          $("group-contact-list").querySelectorAll("input:checked"),
-        );
-        $("group-member-chips").innerHTML = checked
-          .map(
-            (cb) =>
-              `<div class="member-chip">#${escapeHtml(cb.value)} · ${escapeHtml(cb.dataset.name)}<button type="button" onclick="uncheckMember('${escapeAttr(cb.value)}')">×</button></div>`,
-          )
-          .join("");
-      };
-
-      window.uncheckMember = function (num) {
-        const cb = $("group-contact-list").querySelector(
-          `input[value="${num}"]`,
-        );
-        if (cb) {
-          cb.checked = false;
-          updateGroupChips();
-        }
-      };
-
-      window.closeCreateGroupModal = () =>
-        $("create-group-modal").classList.remove("open");
-
-      window.createGroup = async function () {
-        const name = $("group-name").value.trim();
-        const err = $("group-error");
-        if (!name) {
-          err.textContent = "Enter a group name.";
-          return;
-        }
-        const checked = Array.from(
-          $("group-contact-list").querySelectorAll("input:checked"),
-        ).map((cb) => cb.value);
-        if (checked.length < 1) {
-          err.textContent = "Add at least 1 member.";
-          return;
-        }
-        const members = [currentUser.number, ...checked];
-        const groupData = {
-          name,
-          members,
-          createdBy: currentUser.number,
-          createdAt: Date.now(),
-        };
-        const ref = await push(dbRef(db, "groups"), groupData);
-        const gid = ref.key;
-        groups[gid] = groupData;
-        closeCreateGroupModal();
-        showToast(`Group "${name}" created!`);
-        switchTab("groups");
-        openChat(gid, "group");
-      };
-
-      // ── Misc ───────────────────────────────────────────────────────────────
       window.handleKey = function (e) {
         if (e.key === "Enter" && !e.shiftKey) {
           e.preventDefault();
@@ -2815,7 +2064,6 @@
         activeTab = tab;
         $("tab-chats").classList.toggle("active", tab === "chats");
         $("tab-contacts").classList.toggle("active", tab === "contacts");
-        $("tab-groups").classList.toggle("active", tab === "groups");
         renderSidebar();
       };
 
@@ -2826,11 +2074,25 @@
         $("add-contact-modal").classList.add("open");
       };
 
-      window.closeModal = () => $("add-contact-modal").classList.remove("open");
+      window.closeModal = function () {
+        $("add-contact-modal").classList.remove("open");
+      };
+
+      window.showRegister = function () {
+        $("login-card").style.display = "none";
+        $("register-card").style.display = "block";
+      };
+
+      window.showLogin = function () {
+        $("register-card").style.display = "none";
+        $("login-card").style.display = "block";
+      };
+
       window.openImageLightbox = function (src) {
         $("lightbox-image").src = src;
         $("image-modal").classList.add("open");
       };
+
       window.closeImageLightbox = function () {
         $("image-modal").classList.remove("open");
         $("lightbox-image").src = "";
@@ -2842,77 +2104,96 @@
         $("delete-account-error").textContent = "";
         $("delete-account-modal").classList.add("open");
       };
-      window.closeDeleteAccountModal = () =>
+
+      window.closeDeleteAccountModal = function () {
         $("delete-account-modal").classList.remove("open");
+        $("delete-account-error").textContent = "";
+      };
 
       window.deleteAccount = async function () {
         const confirmText = $("delete-account-confirm").value.trim();
         const password = $("delete-account-password").value;
         const err = $("delete-account-error");
+
         if (confirmText !== "DELETE") {
           err.textContent = "Type DELETE exactly to confirm.";
           return;
         }
+
         if (!password) {
           err.textContent = "Enter your password.";
           return;
         }
+
         const userSnap = await get(dbRef(db, `users/${currentUser.username}`));
         if (!userSnap.exists()) {
           err.textContent = "Account not found.";
           return;
         }
+
         const userData = userSnap.val();
         if (userData.passwordHash !== hashPassword(password)) {
           err.textContent = "Wrong password.";
           return;
         }
+
         const contactSnap = await get(
           dbRef(db, `contacts/${currentUser.username}`),
         );
         const contactNums = contactSnap.exists()
           ? Object.keys(contactSnap.val())
           : [];
+
         for (const num of contactNums) {
           const cid = convoId(currentUser.number, num);
           const convoSnap = await get(dbRef(db, `convos/${cid}`));
           if (!convoSnap.exists()) continue;
+
           const convoMsgs = convoSnap.val();
           const remaining = {};
           Object.entries(convoMsgs).forEach(([k, m]) => {
-            if (m.from !== currentUser.number) remaining[k] = m;
+            if (m.from !== currentUser.number) {
+              remaining[k] = m;
+            }
           });
-          if (Object.keys(remaining).length > 0)
+
+          if (Object.keys(remaining).length > 0) {
             await set(dbRef(db, `convos/${cid}`), remaining);
-          else await remove(dbRef(db, `convos/${cid}`));
+          } else {
+            await remove(dbRef(db, `convos/${cid}`));
+          }
         }
+
         await remove(dbRef(db, `contacts/${currentUser.username}`));
         await remove(dbRef(db, `users/${currentUser.username}`));
+
         localStorage.removeItem("pt_user");
         currentUser = null;
         contacts = {};
         activeConvo = null;
         unreadCounts = {};
         convoListeners = {};
+
         closeDeleteAccountModal();
         $("app-screen").classList.remove("active");
         $("auth-screen").classList.add("active");
         $("login-card").style.display = "block";
         $("register-card").style.display = "none";
-        showToast("Account deleted");
+        showToast("account deleted");
       };
 
-      // Close modals on overlay click
       document.addEventListener("click", (e) => {
-        if (e.target === $("add-contact-modal")) closeModal();
-        if (e.target === $("edit-contact-modal")) closeEditContactModal();
-        if (e.target === $("edit-message-modal")) closeEditModal();
-        if (e.target === $("delete-account-modal")) closeDeleteAccountModal();
-        if (e.target === $("image-modal")) closeImageLightbox();
-        if (e.target === $("create-group-modal")) closeCreateGroupModal();
+        const addModal = $("add-contact-modal");
+        const editModal = $("edit-message-modal");
+        const deleteModal = $("delete-account-modal");
+        const imageModal = $("image-modal");
+
+        if (e.target === addModal) closeModal();
+        if (e.target === editModal) closeEditModal();
+        if (e.target === deleteModal) closeDeleteAccountModal();
+        if (e.target === imageModal) closeImageLightbox();
       });
 
-      // ── Auto-login ─────────────────────────────────────────────────────────
       const saved = localStorage.getItem("pt_user");
       if (saved) {
         try {
@@ -2927,8 +2208,7 @@
             }
             if (currentUser) showApp();
           });
-        } catch (e) {
-          console.error("Auto-login failed", e);
+        } catch {
           localStorage.removeItem("pt_user");
         }
       }
