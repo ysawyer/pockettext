@@ -24,6 +24,11 @@
           -webkit-overflow-scrolling: touch;
         }
 
+        .btn-primary:active {
+          transform: scale(0.98);
+          filter: brightness(0.95);
+        }
+
         .auth-card {
           width: 100%;
           max-width: 92vw;
@@ -2677,19 +2682,44 @@
         if (e.target === $("create-group-modal")) closeCreateGroupModal();
       });
 
-      // Better mobile button handling
-      document
-        .getElementById("sign-in-btn")
-        .addEventListener("click", loginUser);
-      document
-        .getElementById("sign-in-btn")
-        .addEventListener("touchend", function (e) {
-          e.preventDefault();
-          loginUser();
-        });
+      // ── MOBILE BUTTON FIX (Critical) ─────────────────────────────────
+      function attachAuthButtons() {
+        console.log("✅ Attaching auth buttons...");
+
+        // Sign In Button
+        const signInBtn = document.getElementById("sign-in-btn");
+        if (signInBtn) {
+          const handler = function (e) {
+            if (e) e.preventDefault();
+            console.log("🔴 Sign In button clicked/tapped!");
+            try {
+              window.loginUser();
+            } catch (err) {
+              console.error("Login error:", err);
+              alert("Login error: " + err.message);
+            }
+          };
+          signInBtn.addEventListener("click", handler);
+          signInBtn.addEventListener("touchend", handler);
+          console.log("Sign In button listener attached");
+        }
+
+        // Register Button
+        const regBtn = document.querySelector("#register-card .btn-primary");
+        if (regBtn) {
+          regBtn.addEventListener("click", () => window.registerUser());
+          regBtn.addEventListener("touchend", (e) => {
+            e.preventDefault();
+            window.registerUser();
+          });
+        }
+      }
+
+      // Run button attachment
+      attachAuthButtons();
+      document.addEventListener("DOMContentLoaded", attachAuthButtons);
 
       // ── Auto-login ───────────────────────────────────────────────────────────
-
       const saved = localStorage.getItem("pt_user");
       if (saved) {
         try {
@@ -2704,7 +2734,8 @@
             }
             if (currentUser) showApp();
           });
-        } catch {
+        } catch (e) {
+          console.error("Auto-login failed", e);
           localStorage.removeItem("pt_user");
         }
       }
