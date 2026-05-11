@@ -1642,22 +1642,49 @@
         holder.innerHTML = `<div class="attachment-chip"><img src="${escapeAttr(objectUrl)}" class="attachment-thumb" alt="selected image"><div class="attachment-meta"><div class="attachment-name">${escapeHtml(file.name)}</div><div class="attachment-sub">${escapeHtml(Math.round(file.size / 1024))} KB → compressed</div></div><button class="attachment-remove" type="button" onclick="removeSelectedImage()">×</button></div>`;
       }
 
-      // ── NOTIFICATIONS ──
+      // ── NOTIFICATIONS (OneSignal + fallback) ──
+
+      // request permission (only needed for fallback browser notifications)
       function requestNotifications() {
         if (!("Notification" in window)) return;
-        if (Notification.permission === "default")
+
+        if (Notification.permission === "default") {
           Notification.requestPermission().catch(() => {});
+        }
       }
 
-      function notify(title, body) {
-        if (
-          !("Notification" in window) ||
-          Notification.permission !== "granted"
-        )
-          return;
+      // fallback notification (ONLY works while app is open)
+      function notifyLocal(title, body) {
+        if (!("Notification" in window)) return;
+        if (Notification.permission !== "granted") return;
+
         try {
           new Notification(title, { body });
-        } catch {}
+        } catch (e) {}
+      }
+
+      // OneSignal push notification helper (REAL push system)
+      async function notifyPush(title, message) {
+        try {
+          if (window.OneSignal) {
+            await OneSignal.Notifications.send({
+              title: title,
+              message: message,
+            });
+          }
+        } catch (e) {
+          // fallback if OneSignal not ready
+          notifyLocal(title, message);
+        }
+      }
+
+      // main notify function (use this everywhere in your app)
+      function notify(title, body) {
+        // try real push first
+        notifyPush(title, body);
+
+        // also show instant in-app notification if open
+        notifyLocal(title, body);
       }
 
       // ── AUTO-DELETE: expired messages with no saves ──
