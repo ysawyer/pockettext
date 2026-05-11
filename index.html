@@ -5,10 +5,6 @@
       src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
       defer
     ></script>
-    <script
-      src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
-      defer
-    ></script>
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function (OneSignal) {
@@ -1132,6 +1128,13 @@
             <div class="sidebar-sub" id="user-display-name"></div>
           </div>
           <div class="sidebar-header-actions">
+            <button
+              class="account-btn"
+              type="button"
+              onclick="askNotifications()"
+            >
+              🔔
+            </button>
             <div class="my-number" id="my-number-badge">####</div>
             <button
               class="account-btn"
@@ -1420,6 +1423,16 @@
 
     <input type="file" id="image-input" accept="image/*" hidden />
     <div class="toast" id="toast"></div>
+    <script>
+      function askNotifications() {
+        if (!("Notification" in window))
+          return alert("Notifications not supported");
+        Notification.requestPermission().then((result) => {
+          if (result === "granted") alert("🔔 Notifications enabled!");
+          else alert("Notifications blocked");
+        });
+      }
+    </script>
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -1695,10 +1708,16 @@
 
       // ── NOTIFICATIONS ──
       function requestNotifications() {
-        if (!("Notification" in window)) return;
-        if (Notification.permission === "default")
-          Notification.requestPermission().catch(() => {});
+        // permission requested on user click instead
       }
+
+      window.askNotifications = async function () {
+        if (!("Notification" in window))
+          return showToast("Notifications not supported");
+        const result = await Notification.requestPermission();
+        if (result === "granted") showToast("🔔 Notifications enabled!");
+        else showToast("Notifications blocked");
+      };
 
       function notifyLocal(title, body) {
         if (!("Notification" in window)) return;
