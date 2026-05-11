@@ -1708,15 +1708,34 @@
 
       // ── NOTIFICATIONS ──
       function requestNotifications() {
-        // permission requested on user click instead
+        if (window.OneSignalDeferred) {
+          OneSignalDeferred.push(async function (OneSignal) {
+            const permission = Notification.permission;
+            if (permission === "granted") {
+              try {
+                await OneSignal.User.PushSubscription.optIn();
+              } catch (e) {}
+            }
+          });
+        }
       }
 
       window.askNotifications = async function () {
         if (!("Notification" in window))
           return showToast("Notifications not supported");
         const result = await Notification.requestPermission();
-        if (result === "granted") showToast("🔔 Notifications enabled!");
-        else showToast("Notifications blocked");
+        if (result === "granted") {
+          showToast("🔔 Notifications enabled!");
+          if (window.OneSignalDeferred) {
+            OneSignalDeferred.push(async function (OneSignal) {
+              try {
+                await OneSignal.User.PushSubscription.optIn();
+              } catch (e) {}
+            });
+          }
+        } else {
+          showToast("Notifications blocked");
+        }
       };
 
       function notifyLocal(title, body) {
