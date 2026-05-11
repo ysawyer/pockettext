@@ -156,6 +156,7 @@
       }
       input[type="text"],
       input[type="password"],
+      input[type="email"],
       textarea {
         width: 100%;
         background: var(--surface2);
@@ -258,6 +259,7 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        flex-shrink: 0;
       }
       .my-number {
         font-family: "DM Mono", monospace;
@@ -284,6 +286,33 @@
         color: var(--text);
         border-color: var(--accent);
       }
+
+      /* ── NEW: Logout button ── */
+      .logout-btn {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 11px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #ff4d4d, #ff1f1f);
+        color: #fff;
+        font-weight: 700;
+        font-size: 12px;
+        font-family: "Syne", sans-serif;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(255, 0, 0, 0.2);
+        transition: 0.2s ease;
+        white-space: nowrap;
+      }
+      .logout-btn:hover {
+        transform: scale(1.05);
+        filter: brightness(1.1);
+      }
+      .logout-btn:active {
+        transform: scale(0.97);
+      }
+
       .sidebar-tabs {
         display: flex;
         border-bottom: 1px solid var(--border);
@@ -818,7 +847,6 @@
         user-select: none;
         -webkit-user-drag: none;
       }
-      /* Skeleton loader for images */
       .image-message.loading {
         min-height: 120px;
         animation: shimmer 1.4s infinite;
@@ -868,8 +896,6 @@
       .toast.show {
         transform: translateX(-50%) translateY(0);
       }
-
-      /* ── NEW: Star / Save ── */
       .star-btn {
         background: transparent;
         border: none;
@@ -897,8 +923,6 @@
         margin-top: 2px;
         opacity: 0.75;
       }
-
-      /* ── NEW: Contact checkboxes in group modal ── */
       .contact-check-list {
         max-height: 160px;
         overflow-y: auto;
@@ -985,8 +1009,6 @@
         flex: 1;
         border-top: 1px solid var(--border);
       }
-
-      /* ── NEW: Upload progress ── */
       .upload-progress {
         height: 2px;
         background: rgba(78, 165, 255, 0.15);
@@ -1000,7 +1022,6 @@
         width: 0%;
         transition: width 0.3s ease;
       }
-
       @media (max-width: 640px) {
         .sidebar {
           width: 100%;
@@ -1039,12 +1060,12 @@
         <div class="auth-title">Welcome back</div>
         <div class="auth-sub">Sign in to your PocketText account</div>
         <div class="error-msg" id="login-error"></div>
-        <label>Username</label>
+        <label>Email</label>
         <input
-          type="text"
-          id="login-username"
-          placeholder="your_username"
-          autocomplete="username"
+          type="email"
+          id="login-email"
+          placeholder="you@example.com"
+          autocomplete="email"
         />
         <label>Password</label>
         <input
@@ -1075,6 +1096,13 @@
         />
         <label>Display Name</label>
         <input type="text" id="reg-name" placeholder="Your Name" />
+        <label>Email</label>
+        <input
+          type="email"
+          id="reg-email"
+          placeholder="you@example.com"
+          autocomplete="email"
+        />
         <label>Password</label>
         <input
           type="password"
@@ -1107,6 +1135,24 @@
               onclick="openDeleteAccountModal()"
             >
               Delete
+            </button>
+            <!-- ── LOGOUT BUTTON ── -->
+            <button class="logout-btn" type="button" id="logout-btn">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              Out
             </button>
           </div>
         </div>
@@ -1261,7 +1307,7 @@
       </div>
     </div>
 
-    <!-- CREATE GROUP MODAL (updated with contact picker) -->
+    <!-- CREATE GROUP MODAL -->
     <div class="modal-overlay" id="create-group-modal">
       <div class="modal">
         <h3>Create Group</h3>
@@ -1316,8 +1362,8 @@
       <div class="modal">
         <h3>Delete Account</h3>
         <p>
-          This permanently removes your account from this device and deletes
-          your profile data from the database.
+          This permanently removes your account and deletes your profile data
+          from the database.
         </p>
         <div class="error-msg" id="delete-account-error"></div>
         <label>Type DELETE to confirm</label>
@@ -1390,6 +1436,18 @@
         getDownloadURL,
       } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
+      // ── NEW: Firebase Auth imports ──
+      import {
+        getAuth,
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        signOut,
+        onAuthStateChanged,
+        deleteUser,
+        EmailAuthProvider,
+        reauthenticateWithCredential,
+      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
       const firebaseConfig = {
         apiKey: "AIzaSyD3zWKNZ4HIyw1rdt2w0iX4sT8J0FpDugg",
         authDomain: "pockettext-1a2bd.firebaseapp.com",
@@ -1404,14 +1462,14 @@
       const app = initializeApp(firebaseConfig);
       const db = getDatabase(app);
       const storage = getStorage(app);
+      const auth = getAuth(app); // ← Firebase Auth instance
 
       const $ = (id) => document.getElementById(id);
 
-      // ── MESSAGE EXPIRY (30 minutes in ms) ──
       const MSG_TTL = 30 * 60 * 1000;
 
       const state = {
-        currentUser: null,
+        currentUser: null, // { uid, username, name, number }
         contacts: {},
         groups: {},
         usersByNumber: {},
@@ -1433,13 +1491,6 @@
         t.textContent = msg;
         t.classList.add("show");
         setTimeout(() => t.classList.remove("show"), 2200);
-      }
-
-      function hashPassword(pw) {
-        let h = 0;
-        for (let i = 0; i < pw.length; i++)
-          h = (Math.imul(31, h) + pw.charCodeAt(i)) | 0;
-        return h.toString(36);
       }
 
       function convoId(a, b) {
@@ -1557,7 +1608,6 @@
         return `<div class="link-preview">${img}<div class="link-preview-body"><div class="link-preview-domain">${site}</div><div class="link-preview-title">${title}</div>${desc ? `<div class="link-preview-desc">${desc}</div>` : ""}</div></div>`;
       }
 
-      // ── IMAGE COMPRESSION ──
       async function compressImage(file, maxPx = 1200, quality = 0.78) {
         return new Promise((resolve) => {
           const img = new Image();
@@ -1588,18 +1638,14 @@
         });
       }
 
-      // ── UPLOAD TO FIREBASE STORAGE (with progress) ──
       async function uploadImageToStorage(file) {
         const compressed = await compressImage(file);
         const path = `images/${state.currentUser.number}/${Date.now()}.webp`;
         const imgRef = storageRef(storage, path);
-
-        // Show progress bar
         const progressWrap = $("upload-progress");
         const progressBar = $("upload-progress-bar");
         progressWrap.style.display = "block";
         progressBar.style.width = "0%";
-
         return new Promise((resolve, reject) => {
           const task = uploadBytesResumable(imgRef, compressed, {
             contentType: "image/webp",
@@ -1607,10 +1653,9 @@
           task.on(
             "state_changed",
             (snap) => {
-              const pct = Math.round(
-                (snap.bytesTransferred / snap.totalBytes) * 100,
-              );
-              progressBar.style.width = pct + "%";
+              progressBar.style.width =
+                Math.round((snap.bytesTransferred / snap.totalBytes) * 100) +
+                "%";
             },
             (err) => {
               progressWrap.style.display = "none";
@@ -1625,7 +1670,6 @@
         });
       }
 
-      // ── ATTACHMENT UI ──
       function clearAttachment() {
         state.selectedImageFile = null;
         if (state.selectedImagePreviewUrl) {
@@ -1645,56 +1689,39 @@
         holder.innerHTML = `<div class="attachment-chip"><img src="${escapeAttr(objectUrl)}" class="attachment-thumb" alt="selected image"><div class="attachment-meta"><div class="attachment-name">${escapeHtml(file.name)}</div><div class="attachment-sub">${escapeHtml(Math.round(file.size / 1024))} KB → compressed</div></div><button class="attachment-remove" type="button" onclick="removeSelectedImage()">×</button></div>`;
       }
 
-      // ── NOTIFICATIONS (OneSignal + fallback) ──
-
-      // request permission (only needed for fallback browser notifications)
+      // ── NOTIFICATIONS ──
       function requestNotifications() {
         if (!("Notification" in window)) return;
-
-        if (Notification.permission === "default") {
+        if (Notification.permission === "default")
           Notification.requestPermission().catch(() => {});
-        }
       }
 
-      // fallback notification (ONLY works while app is open)
       function notifyLocal(title, body) {
         if (!("Notification" in window)) return;
         if (Notification.permission !== "granted") return;
-
         try {
           new Notification(title, { body });
         } catch (e) {}
       }
 
-      // OneSignal push notification helper (REAL push system)
       async function notifyPush(title, message) {
         try {
-          if (window.OneSignal) {
-            await OneSignal.Notifications.send({
-              title: title,
-              message: message,
-            });
-          }
+          if (window.OneSignal)
+            await OneSignal.Notifications.send({ title, message });
         } catch (e) {
-          // fallback if OneSignal not ready
           notifyLocal(title, message);
         }
       }
 
-      // main notify function (use this everywhere in your app)
       function notify(title, body) {
-        // try real push first
         notifyPush(title, body);
-
-        // also show instant in-app notification if open
         notifyLocal(title, body);
       }
 
-      // ── AUTO-DELETE: expired messages with no saves ──
+      // ── MESSAGE EXPIRY ──
       function isMessageVisible(msg) {
-        if (!msg || !msg.expiresAt) return true; // no expiry = legacy, always show
-        if (msg.expiresAt > Date.now()) return true; // not yet expired
-        // expired — show only if the current user saved it
+        if (!msg || !msg.expiresAt) return true;
+        if (msg.expiresAt > Date.now()) return true;
         return !!(msg.savedBy && msg.savedBy[state.currentUser?.number]);
       }
 
@@ -1705,19 +1732,15 @@
         const base = isGroup
           ? `groupConvos/${threadKey.slice(6)}`
           : `convos/${threadKey}`;
-
         Object.entries(msgs || {}).forEach(([key, msg]) => {
-          if (!msg.expiresAt) return;
-          if (msg.expiresAt > now) return;
+          if (!msg.expiresAt || msg.expiresAt > now) return;
           const hasSaves = msg.savedBy && Object.keys(msg.savedBy).length > 0;
           if (!hasSaves) updates[`${base}/${key}`] = null;
         });
-
         if (Object.keys(updates).length)
           update(dbRef(db), updates).catch(() => {});
       }
 
-      // ── TOGGLE STAR / SAVE ──
       window.toggleStar = async function (threadKey, key) {
         const msg = state.messages[threadKey]?.[key];
         if (!msg) return;
@@ -1885,7 +1908,6 @@
         }
       }
 
-      // ── RENDER THREAD HEADER ──
       function renderThreadHeader(meta) {
         const empty = $("empty-state");
         const chat = $("active-chat");
@@ -1907,15 +1929,10 @@
         }
       }
 
-      // ── RENDER MESSAGES (with auto-cleanup, lazy images, stars) ──
       function renderMessages(threadKey) {
         const el = $("chat-messages");
         const msgs = state.messages[threadKey] || {};
-
-        // Clean up expired unsaved messages
         cleanupExpiredMessages(threadKey, msgs);
-
-        const now = Date.now();
         const isGroup = threadKey.startsWith("group_");
         const sorted = Object.entries(msgs)
           .filter(([, m]) => isMessageVisible(m))
@@ -1947,7 +1964,6 @@
             }
 
             if (m.type === "image" && m.imageUrl) {
-              // lazy-loaded image with skeleton
               contentHtml += `<img src="${escapeAttr(m.imageUrl)}" alt="sent image" class="image-message loading" loading="lazy" onclick="openImageLightbox('${escapeAttr(m.imageUrl)}')" onload="this.classList.remove('loading')" onerror="this.classList.remove('loading')">`;
               if (m.caption)
                 contentHtml += `<div class="caption-spacer"></div><div class="message-text">${renderTextWithLinks(m.caption)}</div>`;
@@ -1963,7 +1979,6 @@
             );
             const starBtn = `<button class="star-btn${isSaved ? " saved" : ""}" type="button" onclick="toggleStar('${escapeAttr(threadKey)}','${escapeAttr(key)}')" title="${isSaved ? "Unsave message" : "Save message"}">${isSaved ? "⭐" : "☆"}</button>`;
 
-            // For outgoing: star goes in message-actions; for incoming: appended after content
             const actions = out
               ? `<div class="message-actions">
                 ${starBtn}
@@ -1972,7 +1987,6 @@
                </div>`
               : `<div style="display:flex;justify-content:flex-end;margin-top:6px">${starBtn}</div>`;
 
-            // Show expiry countdown only when < 25 min left and not saved
             const expiry = expiryLabel(m.expiresAt);
             const expiryHtml =
               expiry && !isSaved
@@ -1980,16 +1994,16 @@
                 : "";
 
             return `${divider}
-            <div class="msg-row ${out ? "outgoing" : "incoming"}" data-key="${escapeAttr(key)}">
-              <div class="bubble">
-                ${contentHtml || "&nbsp;"}
-                ${actions}
-              </div>
-              <div>
-                <div class="msg-time">${escapeHtml(timeStr(m.ts))}</div>
-                ${expiryHtml}
-              </div>
-            </div>`;
+          <div class="msg-row ${out ? "outgoing" : "incoming"}" data-key="${escapeAttr(key)}">
+            <div class="bubble">
+              ${contentHtml || "&nbsp;"}
+              ${actions}
+            </div>
+            <div>
+              <div class="msg-time">${escapeHtml(timeStr(m.ts))}</div>
+              ${expiryHtml}
+            </div>
+          </div>`;
           })
           .join("");
 
@@ -2074,14 +2088,15 @@
         onValue(dbRef(db, "users"), (snap) => {
           state.usersByNumber = {};
           if (snap.exists())
-            Object.entries(snap.val()).forEach(([username, user]) => {
+            Object.entries(snap.val()).forEach(([uid, user]) => {
               if (user?.number)
-                state.usersByNumber[user.number] = { ...user, username };
+                state.usersByNumber[user.number] = { ...user, uid };
             });
           syncMetaFromDb();
         });
 
-        onValue(dbRef(db, `contacts/${state.currentUser.username}`), (snap) => {
+        // ── contacts keyed by uid now ──
+        onValue(dbRef(db, `contacts/${state.currentUser.uid}`), (snap) => {
           state.contacts = snap.exists() ? snap.val() : {};
           syncMetaFromDb();
         });
@@ -2139,9 +2154,9 @@
         return num;
       }
 
-      async function loginSuccess(userData) {
+      // ── ENTER APP (called after Auth confirms user) ──
+      function enterApp(userData) {
         state.currentUser = userData;
-        localStorage.setItem("pt_user", JSON.stringify(userData));
         $("auth-screen").classList.remove("active");
         $("app-screen").classList.add("active");
         $("my-number-badge").textContent = "#" + userData.number;
@@ -2151,46 +2166,108 @@
         renderSidebar();
       }
 
-      // ── AUTH ──
+      function resetAppState() {
+        Object.assign(state, {
+          currentUser: null,
+          contacts: {},
+          groups: {},
+          messages: {},
+          dmMeta: {},
+          groupMeta: {},
+          activeThread: null,
+          seenKeys: {},
+          listenersStarted: false,
+          selectedImageFile: null,
+          selectedImagePreviewUrl: null,
+          editing: { key: null, path: null, data: null },
+        });
+      }
+
+      // ── FIREBASE AUTH STATE OBSERVER (replaces localStorage auto-login) ──
+      onAuthStateChanged(auth, async (firebaseUser) => {
+        if (firebaseUser) {
+          // User is signed in — load their profile from /users/{uid}
+          const snap = await get(dbRef(db, `users/${firebaseUser.uid}`));
+          if (snap.exists()) {
+            enterApp({ uid: firebaseUser.uid, ...snap.val() });
+          } else {
+            // Profile missing (edge case) — sign them out
+            await signOut(auth);
+          }
+        } else {
+          // Signed out — show auth screen
+          resetAppState();
+          $("app-screen").classList.remove("active");
+          $("auth-screen").classList.add("active");
+          $("login-card").style.display = "block";
+          $("register-card").style.display = "none";
+        }
+      });
+
+      // ── LOGOUT BUTTON ──
+      $("logout-btn").addEventListener("click", async () => {
+        await signOut(auth);
+        showToast("Signed out");
+      });
+
+      // ── REGISTER (Firebase Auth + profile in /users/{uid}) ──
       window.registerUser = async function () {
         const username = $("reg-username").value.trim().toLowerCase();
         const name = $("reg-name").value.trim();
+        const email = $("reg-email").value.trim();
         const password = $("reg-password").value;
         const errEl = $("reg-error");
-        if (!username || !name || !password)
+
+        if (!username || !name || !email || !password)
           return (errEl.textContent = "All fields required.");
         if (username.length < 3)
           return (errEl.textContent = "Username must be 3+ characters.");
-        if (password.length < 4)
-          return (errEl.textContent = "Password must be 4+ characters.");
+        if (password.length < 6)
+          return (errEl.textContent = "Password must be 6+ characters.");
+
         errEl.textContent = "";
-        const snap = await get(dbRef(db, `users/${username}`));
-        if (snap.exists())
-          return (errEl.textContent = "Username already taken.");
-        const number = await assignNumber();
-        const userData = {
-          username,
-          name,
-          number,
-          passwordHash: hashPassword(password),
-        };
-        await set(dbRef(db, `users/${username}`), userData);
-        await loginSuccess(userData);
+
+        // Check username uniqueness (scan users)
+        const usersSnap = await get(dbRef(db, "users"));
+        if (usersSnap.exists()) {
+          const taken = Object.values(usersSnap.val()).some(
+            (u) => u.username === username,
+          );
+          if (taken) return (errEl.textContent = "Username already taken.");
+        }
+
+        try {
+          const cred = await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password,
+          );
+          const uid = cred.user.uid;
+          const number = await assignNumber();
+          const profile = { username, name, number }; // ← no password stored
+          await set(dbRef(db, `users/${uid}`), profile);
+          // onAuthStateChanged will fire and call enterApp automatically
+        } catch (e) {
+          errEl.textContent = e.message || "Registration failed.";
+        }
       };
 
+      // ── LOGIN (Firebase Auth only) ──
       window.loginUser = async function () {
-        const username = $("login-username").value.trim().toLowerCase();
+        const email = $("login-email").value.trim();
         const password = $("login-password").value;
         const errEl = $("login-error");
-        if (!username || !password)
-          return (errEl.textContent = "Enter username & password.");
+
+        if (!email || !password)
+          return (errEl.textContent = "Enter email & password.");
         errEl.textContent = "";
-        const snap = await get(dbRef(db, `users/${username}`));
-        if (!snap.exists()) return (errEl.textContent = "User not found.");
-        const data = snap.val();
-        if (data.passwordHash !== hashPassword(password))
-          return (errEl.textContent = "Wrong password.");
-        await loginSuccess(data);
+
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          // onAuthStateChanged fires and loads the app
+        } catch (e) {
+          errEl.textContent = "Incorrect email or password.";
+        }
       };
 
       // ── TABS ──
@@ -2202,7 +2279,7 @@
         renderSidebar();
       };
 
-      // ── CONTACTS ──
+      // ── CONTACTS (keyed by uid in db) ──
       window.openAddContact = function () {
         $("contact-number").value = "";
         $("contact-nickname").value = "";
@@ -2225,8 +2302,8 @@
         const usersSnap = await get(dbRef(db, "users"));
         if (!usersSnap.exists()) return (errEl.textContent = "No users found.");
         let found = null;
-        Object.entries(usersSnap.val()).forEach(([username, user]) => {
-          if (user.number === num) found = { ...user, username };
+        Object.entries(usersSnap.val()).forEach(([uid, user]) => {
+          if (user.number === num) found = { ...user, uid };
         });
         if (!found) return (errEl.textContent = "No user with that number.");
         state.contacts[num] = {
@@ -2234,8 +2311,9 @@
           name: found.name,
           nickname: nick || "",
         };
+        // Store contacts under /contacts/{uid}/
         await set(
-          dbRef(db, `contacts/${state.currentUser.username}/${num}`),
+          dbRef(db, `contacts/${state.currentUser.uid}/${num}`),
           state.contacts[num],
         );
         closeModal();
@@ -2243,13 +2321,11 @@
         renderSidebar();
       };
 
-      // ── GROUPS (with contact picker) ──
+      // ── GROUPS ──
       window.openGroupModal = function () {
         $("group-name").value = "";
         $("group-members").value = "";
         $("group-error").textContent = "";
-
-        // Populate contact checkboxes
         const list = $("group-contact-list");
         const contacts = Object.values(state.contacts);
         if (contacts.length) {
@@ -2269,7 +2345,6 @@
         } else {
           list.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:8px">No contacts yet — enter numbers below.</div>`;
         }
-
         $("create-group-modal").classList.add("open");
       };
 
@@ -2281,8 +2356,6 @@
         const name = $("group-name").value.trim();
         const err = $("group-error");
         if (!name) return (err.textContent = "Group name is required.");
-
-        // Collect from checkboxes AND manual textarea
         const checkedNums = [
           ...document.querySelectorAll(".group-contact-check:checked"),
         ].map((el) => el.value);
@@ -2294,33 +2367,28 @@
               .filter(Boolean)
           : [];
         const allNums = [...new Set([...checkedNums, ...manualNums])];
-
         if (!allNums.length)
           return (err.textContent = "Select at least one member.");
         if (allNums.includes(state.currentUser.number))
           return (err.textContent = "Your number is added automatically.");
-
         const usersSnap = await get(dbRef(db, "users"));
         const allUsers = usersSnap.exists() ? usersSnap.val() : {};
         const members = { [state.currentUser.number]: true };
         const invalid = [];
-
         allNums.forEach((num) => {
           const match = Object.values(allUsers).find((u) => u.number === num);
           if (match) members[num] = true;
           else invalid.push(num);
         });
-
         if (Object.keys(members).length < 2)
           return (err.textContent = "At least one valid member is required.");
         if (invalid.length)
           return (err.textContent = `Unknown numbers: ${invalid.join(", ")}`);
-
         const gRef = push(dbRef(db, "groups"));
         const gid = gRef.key;
         await set(gRef, {
           name,
-          createdBy: state.currentUser.username,
+          createdBy: state.currentUser.uid,
           createdByNumber: state.currentUser.number,
           createdAt: Date.now(),
           members,
@@ -2413,7 +2481,7 @@
             from: state.currentUser.number,
             fromName: state.currentUser.name,
             ts: Date.now(),
-            expiresAt: Date.now() + MSG_TTL, // ← auto-expire in 30 min
+            expiresAt: Date.now() + MSG_TTL,
             read: false,
           };
 
@@ -2528,7 +2596,7 @@
         $("lightbox-image").src = "";
       };
 
-      // ── DELETE ACCOUNT ──
+      // ── DELETE ACCOUNT (re-authenticate with Firebase, then delete) ──
       window.openDeleteAccountModal = function () {
         $("delete-account-confirm").value = "";
         $("delete-account-password").value = "";
@@ -2543,45 +2611,54 @@
         const confirmText = $("delete-account-confirm").value.trim();
         const password = $("delete-account-password").value;
         const err = $("delete-account-error");
+
         if (confirmText !== "DELETE")
           return (err.textContent = "Type DELETE exactly to confirm.");
         if (!password) return (err.textContent = "Enter your password.");
-        const userSnap = await get(
-          dbRef(db, `users/${state.currentUser.username}`),
-        );
-        if (!userSnap.exists()) return (err.textContent = "Account not found.");
-        const userData = userSnap.val();
-        if (userData.passwordHash !== hashPassword(password))
-          return (err.textContent = "Wrong password.");
-        await remove(dbRef(db, `contacts/${state.currentUser.username}`));
-        await remove(dbRef(db, `users/${state.currentUser.username}`));
-        const groupsSnap = await get(dbRef(db, "groups"));
-        if (groupsSnap.exists()) {
-          const updates = {};
-          Object.entries(groupsSnap.val()).forEach(([gid, g]) => {
-            if (g?.members?.[state.currentUser.number])
-              updates[`groups/${gid}/members/${state.currentUser.number}`] =
-                null;
-          });
-          if (Object.keys(updates).length) await update(dbRef(db), updates);
+
+        try {
+          const firebaseUser = auth.currentUser;
+          if (!firebaseUser) return (err.textContent = "Not signed in.");
+
+          // Re-authenticate before destructive operation
+          const credential = EmailAuthProvider.credential(
+            firebaseUser.email,
+            password,
+          );
+          await reauthenticateWithCredential(firebaseUser, credential);
+
+          const uid = state.currentUser.uid;
+
+          // Clean up database records
+          await remove(dbRef(db, `contacts/${uid}`));
+          await remove(dbRef(db, `users/${uid}`));
+
+          const groupsSnap = await get(dbRef(db, "groups"));
+          if (groupsSnap.exists()) {
+            const updates = {};
+            Object.entries(groupsSnap.val()).forEach(([gid, g]) => {
+              if (g?.members?.[state.currentUser.number])
+                updates[`groups/${gid}/members/${state.currentUser.number}`] =
+                  null;
+            });
+            if (Object.keys(updates).length) await update(dbRef(db), updates);
+          }
+
+          // Delete Firebase Auth account
+          await deleteUser(firebaseUser);
+          // onAuthStateChanged will fire and reset the UI
+          closeDeleteAccountModal();
+          showToast("account deleted");
+        } catch (e) {
+          if (
+            e.code === "auth/wrong-password" ||
+            e.code === "auth/invalid-credential"
+          ) {
+            err.textContent = "Wrong password.";
+          } else {
+            err.textContent = e.message || "Deletion failed.";
+          }
         }
-        localStorage.removeItem("pt_user");
-        Object.assign(state, {
-          currentUser: null,
-          contacts: {},
-          groups: {},
-          messages: {},
-          dmMeta: {},
-          groupMeta: {},
-          activeThread: null,
-          listenersStarted: false,
-        });
-        closeDeleteAccountModal();
-        $("app-screen").classList.remove("active");
-        $("auth-screen").classList.add("active");
-        $("login-card").style.display = "block";
-        $("register-card").style.display = "none";
-        showToast("account deleted");
       };
 
       // ── AUTH SWITCH ──
@@ -2607,34 +2684,6 @@
         });
         if (e.target === $("image-modal")) closeImageLightbox();
       });
-
-      // ── AUTO-LOGIN ──
-      const saved = localStorage.getItem("pt_user");
-      if (saved) {
-        try {
-          state.currentUser = JSON.parse(saved);
-          get(dbRef(db, `users/${state.currentUser.username}`)).then((snap) => {
-            if (snap.exists()) {
-              state.currentUser = snap.val();
-              localStorage.setItem(
-                "pt_user",
-                JSON.stringify(state.currentUser),
-              );
-              $("auth-screen").classList.remove("active");
-              $("app-screen").classList.add("active");
-              $("my-number-badge").textContent = "#" + state.currentUser.number;
-              $("user-display-name").textContent = state.currentUser.name;
-              requestNotifications();
-              startListeners();
-            } else {
-              localStorage.removeItem("pt_user");
-              state.currentUser = null;
-            }
-          });
-        } catch {
-          localStorage.removeItem("pt_user");
-        }
-      }
     </script>
   </body>
 </html>
