@@ -1729,16 +1729,17 @@
 
       async function notifyPush(title, message) {
         try {
-          if (window.OneSignal)
+          if (window.OneSignal) {
             await OneSignal.Notifications.send({ title, message });
-        } catch (e) {
-          notifyLocal(title, message);
-        }
+            return true;
+          }
+        } catch (e) {}
+        return false;
       }
 
-      function notify(title, body) {
-        notifyPush(title, body);
-        notifyLocal(title, body);
+      async function notify(title, body) {
+        const sent = await notifyPush(title, body);
+        if (!sent) notifyLocal(title, body);
       }
 
       // ── MESSAGE EXPIRY ──
