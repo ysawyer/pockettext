@@ -1,23 +1,13 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <!-- === WEB APP ICONS === -->
-  
-  <!-- Favicon for Safari browser tab -->
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-  
-  <!-- Apple Touch Icon - Shows when added to Home Screen on iPhone/iPad -->
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  
-  <!-- PWA Manifest (important for proper Home Screen behavior) -->
-  <link rel="manifest" href="manifest.json">
-  
-  <title>PocketText</title>
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+    <link rel="manifest" href="manifest.json" />
+    <title>PocketText</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap"
       rel="stylesheet"
@@ -452,7 +442,7 @@
       .msg-row {
         display: flex;
         align-items: flex-end;
-        gap: 8px;
+        gap: 6px;
         max-width: 72%;
       }
       .msg-row.outgoing {
@@ -699,7 +689,7 @@
         margin-bottom: 16px;
       }
       .modal textarea {
-        min-height: 120px;
+        min-height: 80px;
         resize: vertical;
         margin-bottom: 0;
       }
@@ -808,12 +798,30 @@
         max-width: 320px;
         max-height: 360px;
         object-fit: cover;
-        background: transparent;
-        border: none;
-        box-shadow: none;
+        background: var(--surface3);
         cursor: zoom-in;
         user-select: none;
         -webkit-user-drag: none;
+      }
+      /* Skeleton loader for images */
+      .image-message.loading {
+        min-height: 120px;
+        animation: shimmer 1.4s infinite;
+        background: linear-gradient(
+          90deg,
+          var(--surface2) 25%,
+          var(--surface3) 50%,
+          var(--surface2) 75%
+        );
+        background-size: 200% 100%;
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
       }
       .caption-spacer {
         height: 8px;
@@ -845,6 +853,139 @@
       .toast.show {
         transform: translateX(-50%) translateY(0);
       }
+
+      /* ── NEW: Star / Save ── */
+      .star-btn {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 2px 5px;
+        opacity: 0.35;
+        transition: 0.15s;
+        line-height: 1;
+        border-radius: 6px;
+        flex-shrink: 0;
+      }
+      .star-btn:hover {
+        opacity: 0.8;
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .star-btn.saved {
+        opacity: 1;
+      }
+      .expiry-tag {
+        font-size: 10px;
+        font-family: "DM Mono", monospace;
+        color: var(--muted);
+        white-space: nowrap;
+        margin-top: 2px;
+        opacity: 0.75;
+      }
+
+      /* ── NEW: Contact checkboxes in group modal ── */
+      .contact-check-list {
+        max-height: 160px;
+        overflow-y: auto;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 4px;
+        margin-bottom: 12px;
+        background: var(--surface);
+      }
+      .contact-check-list::-webkit-scrollbar {
+        width: 4px;
+      }
+      .contact-check-list::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 2px;
+      }
+      .contact-check-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 9px;
+        cursor: pointer;
+        transition: 0.15s;
+        user-select: none;
+      }
+      .contact-check-item:hover {
+        background: var(--surface2);
+      }
+      .contact-check-item .check-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: linear-gradient(
+          180deg,
+          rgba(78, 165, 255, 0.15),
+          rgba(78, 165, 255, 0.06)
+        );
+        border: 1px solid rgba(124, 201, 255, 0.18);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--accent);
+        flex-shrink: 0;
+      }
+      .contact-check-item .check-name {
+        font-size: 13px;
+        font-weight: 700;
+        flex: 1;
+      }
+      .contact-check-item .check-num {
+        font-size: 11px;
+        color: var(--muted);
+        font-family: "DM Mono", monospace;
+      }
+      .contact-check-item input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        accent-color: var(--accent);
+        flex-shrink: 0;
+        margin: 0;
+        padding: 0;
+        border: none;
+        background: transparent;
+        margin-bottom: 0;
+      }
+      .or-divider {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin: 8px 0;
+      }
+      .or-divider::before,
+      .or-divider::after {
+        content: "";
+        flex: 1;
+        border-top: 1px solid var(--border);
+      }
+
+      /* ── NEW: Upload progress ── */
+      .upload-progress {
+        height: 2px;
+        background: rgba(78, 165, 255, 0.15);
+        border-radius: 1px;
+        overflow: hidden;
+        margin: 0 24px 0;
+      }
+      .upload-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+
       @media (max-width: 640px) {
         .sidebar {
           width: 100%;
@@ -872,6 +1013,7 @@
     </style>
   </head>
   <body>
+    <!-- AUTH SCREEN -->
     <div id="auth-screen" class="screen active">
       <div class="grid-bg"></div>
       <div class="auth-card" id="login-card">
@@ -901,7 +1043,6 @@
           Create new account →
         </button>
       </div>
-
       <div class="auth-card" id="register-card" style="display: none">
         <div class="logo">
           <div class="logo-icon">💬</div>
@@ -935,6 +1076,7 @@
       </div>
     </div>
 
+    <!-- APP SCREEN -->
     <div id="app-screen" class="screen">
       <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -994,7 +1136,6 @@
             Pick a contact or a group from the sidebar
           </div>
         </div>
-
         <div
           id="active-chat"
           style="display: none; flex-direction: column; height: 100%"
@@ -1007,9 +1148,14 @@
             </div>
             <div class="online-dot" title="Realtime"></div>
           </div>
-
           <div class="chat-messages" id="chat-messages"></div>
-
+          <div
+            class="upload-progress"
+            id="upload-progress"
+            style="display: none"
+          >
+            <div class="upload-progress-bar" id="upload-progress-bar"></div>
+          </div>
           <div class="chat-input-stack">
             <div
               class="attachment-preview"
@@ -1069,6 +1215,7 @@
       </div>
     </div>
 
+    <!-- ADD CONTACT MODAL -->
     <div class="modal-overlay" id="add-contact-modal">
       <div class="modal">
         <h3>Add Contact</h3>
@@ -1080,7 +1227,7 @@
           placeholder="1234"
           maxlength="4"
           style="font-size: 24px; letter-spacing: 4px; text-align: center"
-          oninput="this.value = this.value.replace(/\\D/g, '')"
+          oninput="this.value = this.value.replace(/\D/g, '')"
         />
         <label>Nickname (optional)</label>
         <input
@@ -1099,17 +1246,25 @@
       </div>
     </div>
 
+    <!-- CREATE GROUP MODAL (updated with contact picker) -->
     <div class="modal-overlay" id="create-group-modal">
       <div class="modal">
         <h3>Create Group</h3>
         <div class="error-msg" id="group-error"></div>
         <label>Group Name</label>
         <input type="text" id="group-name" placeholder="Study Group" />
+        <label>Add from Contacts</label>
+        <div class="contact-check-list" id="group-contact-list">
+          <div style="color: var(--muted); font-size: 13px; padding: 8px">
+            No contacts yet.
+          </div>
+        </div>
+        <div class="or-divider">or enter numbers</div>
         <label>Member Numbers</label>
-        <textarea id="group-members" placeholder="1234, 5678, 9012"></textarea>
-        <p style="margin-top: 6px">
-          Use commas or spaces. Your number is added automatically.
-        </p>
+        <textarea
+          id="group-members"
+          placeholder="1234, 5678 (optional — use above checkboxes instead)"
+        ></textarea>
         <div class="modal-actions">
           <button class="btn btn-ghost btn-sm" onclick="closeGroupModal()">
             Cancel
@@ -1121,6 +1276,7 @@
       </div>
     </div>
 
+    <!-- EDIT MESSAGE MODAL -->
     <div class="modal-overlay" id="edit-message-modal">
       <div class="modal">
         <h3>Edit Message</h3>
@@ -1140,6 +1296,7 @@
       </div>
     </div>
 
+    <!-- DELETE ACCOUNT MODAL -->
     <div class="modal-overlay" id="delete-account-modal">
       <div class="modal">
         <h3>Delete Account</h3>
@@ -1176,6 +1333,7 @@
       </div>
     </div>
 
+    <!-- IMAGE LIGHTBOX MODAL -->
     <div class="modal-overlay" id="image-modal">
       <div
         class="modal"
@@ -1210,7 +1368,12 @@
         update,
         remove,
       } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-      import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+      import {
+        getStorage,
+        ref as storageRef,
+        uploadBytesResumable,
+        getDownloadURL,
+      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyD3zWKNZ4HIyw1rdt2w0iX4sT8J0FpDugg",
@@ -1225,9 +1388,12 @@
 
       const app = initializeApp(firebaseConfig);
       const db = getDatabase(app);
-      getStorage(app);
+      const storage = getStorage(app);
 
       const $ = (id) => document.getElementById(id);
+
+      // ── MESSAGE EXPIRY (30 minutes in ms) ──
+      const MSG_TTL = 30 * 60 * 1000;
 
       const state = {
         currentUser: null,
@@ -1246,6 +1412,7 @@
         listenersStarted: false,
       };
 
+      // ── HELPERS ──
       function showToast(msg) {
         const t = $("toast");
         t.textContent = msg;
@@ -1263,7 +1430,6 @@
       function convoId(a, b) {
         return [a, b].sort().join("_");
       }
-
       function groupThreadKey(groupId) {
         return `group_${groupId}`;
       }
@@ -1280,6 +1446,16 @@
           });
         if (diffDays === 1) return "Yesterday";
         return d.toLocaleDateString([], { month: "short", day: "numeric" });
+      }
+
+      function expiryLabel(expiresAt) {
+        if (!expiresAt) return "";
+        const left = expiresAt - Date.now();
+        if (left <= 0) return "";
+        const mins = Math.ceil(left / 60000);
+        if (mins >= 60) return "";
+        if (mins <= 1) return "⏱ <1m";
+        return `⏱ ${mins}m`;
       }
 
       function getInitials(name) {
@@ -1332,8 +1508,9 @@
 
       async function fetchLinkPreview(url) {
         try {
-          const endpoint = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
-          const res = await fetch(endpoint);
+          const res = await fetch(
+            `https://api.microlink.io/?url=${encodeURIComponent(url)}`,
+          );
           const json = await res.json();
           const data = json?.data || {};
           return {
@@ -1360,19 +1537,80 @@
         const desc = escapeHtml(preview.description || "");
         const site = escapeHtml(preview.siteName || safeHost(preview.url));
         const img = preview.image
-          ? `<img src="${escapeAttr(preview.image)}" alt="" class="link-preview-image">`
+          ? `<img src="${escapeAttr(preview.image)}" alt="" class="link-preview-image" loading="lazy">`
           : "";
-        return `
-        <div class="link-preview">
-          ${img}
-          <div class="link-preview-body">
-            <div class="link-preview-domain">${site}</div>
-            <div class="link-preview-title">${title}</div>
-            ${desc ? `<div class="link-preview-desc">${desc}</div>` : ""}
-          </div>
-        </div>`;
+        return `<div class="link-preview">${img}<div class="link-preview-body"><div class="link-preview-domain">${site}</div><div class="link-preview-title">${title}</div>${desc ? `<div class="link-preview-desc">${desc}</div>` : ""}</div></div>`;
       }
 
+      // ── IMAGE COMPRESSION ──
+      async function compressImage(file, maxPx = 1200, quality = 0.78) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          const blobUrl = URL.createObjectURL(file);
+          img.onload = () => {
+            let { width: w, height: h } = img;
+            if (w > maxPx || h > maxPx) {
+              const ratio = Math.min(maxPx / w, maxPx / h);
+              w = Math.round(w * ratio);
+              h = Math.round(h * ratio);
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+            URL.revokeObjectURL(blobUrl);
+            canvas.toBlob(
+              (blob) => resolve(blob || file),
+              "image/webp",
+              quality,
+            );
+          };
+          img.onerror = () => {
+            URL.revokeObjectURL(blobUrl);
+            resolve(file);
+          };
+          img.src = blobUrl;
+        });
+      }
+
+      // ── UPLOAD TO FIREBASE STORAGE (with progress) ──
+      async function uploadImageToStorage(file) {
+        const compressed = await compressImage(file);
+        const path = `images/${state.currentUser.number}/${Date.now()}.webp`;
+        const imgRef = storageRef(storage, path);
+
+        // Show progress bar
+        const progressWrap = $("upload-progress");
+        const progressBar = $("upload-progress-bar");
+        progressWrap.style.display = "block";
+        progressBar.style.width = "0%";
+
+        return new Promise((resolve, reject) => {
+          const task = uploadBytesResumable(imgRef, compressed, {
+            contentType: "image/webp",
+          });
+          task.on(
+            "state_changed",
+            (snap) => {
+              const pct = Math.round(
+                (snap.bytesTransferred / snap.totalBytes) * 100,
+              );
+              progressBar.style.width = pct + "%";
+            },
+            (err) => {
+              progressWrap.style.display = "none";
+              reject(err);
+            },
+            async () => {
+              progressWrap.style.display = "none";
+              progressBar.style.width = "0%";
+              resolve(await getDownloadURL(task.snapshot.ref));
+            },
+          );
+        });
+      }
+
+      // ── ATTACHMENT UI ──
       function clearAttachment() {
         state.selectedImageFile = null;
         if (state.selectedImagePreviewUrl) {
@@ -1389,37 +1627,79 @@
         holder.style.display = "block";
         const objectUrl = URL.createObjectURL(file);
         state.selectedImagePreviewUrl = objectUrl;
-        holder.innerHTML = `
-        <div class="attachment-chip">
-          <img src="${escapeAttr(objectUrl)}" class="attachment-thumb" alt="selected image">
-          <div class="attachment-meta">
-            <div class="attachment-name">${escapeHtml(file.name)}</div>
-            <div class="attachment-sub">${escapeHtml(Math.round(file.size / 1024))} KB</div>
-          </div>
-          <button class="attachment-remove" type="button" onclick="removeSelectedImage()">×</button>
-        </div>`;
+        holder.innerHTML = `<div class="attachment-chip"><img src="${escapeAttr(objectUrl)}" class="attachment-thumb" alt="selected image"><div class="attachment-meta"><div class="attachment-name">${escapeHtml(file.name)}</div><div class="attachment-sub">${escapeHtml(Math.round(file.size / 1024))} KB → compressed</div></div><button class="attachment-remove" type="button" onclick="removeSelectedImage()">×</button></div>`;
       }
 
+      // ── NOTIFICATIONS ──
       function requestNotifications() {
         if (!("Notification" in window)) return;
-        if (Notification.permission === "default") {
+        if (Notification.permission === "default")
           Notification.requestPermission().catch(() => {});
-        }
       }
 
       function notify(title, body) {
-        if (!("Notification" in window)) return;
-        if (Notification.permission !== "granted") return;
+        if (
+          !("Notification" in window) ||
+          Notification.permission !== "granted"
+        )
+          return;
         try {
           new Notification(title, { body });
         } catch {}
       }
 
+      // ── AUTO-DELETE: expired messages with no saves ──
+      function isMessageVisible(msg) {
+        if (!msg || !msg.expiresAt) return true; // no expiry = legacy, always show
+        if (msg.expiresAt > Date.now()) return true; // not yet expired
+        // expired — show only if the current user saved it
+        return !!(msg.savedBy && msg.savedBy[state.currentUser?.number]);
+      }
+
+      function cleanupExpiredMessages(threadKey, msgs) {
+        const now = Date.now();
+        const updates = {};
+        const isGroup = threadKey.startsWith("group_");
+        const base = isGroup
+          ? `groupConvos/${threadKey.slice(6)}`
+          : `convos/${threadKey}`;
+
+        Object.entries(msgs || {}).forEach(([key, msg]) => {
+          if (!msg.expiresAt) return;
+          if (msg.expiresAt > now) return;
+          const hasSaves = msg.savedBy && Object.keys(msg.savedBy).length > 0;
+          if (!hasSaves) updates[`${base}/${key}`] = null;
+        });
+
+        if (Object.keys(updates).length)
+          update(dbRef(db), updates).catch(() => {});
+      }
+
+      // ── TOGGLE STAR / SAVE ──
+      window.toggleStar = async function (threadKey, key) {
+        const msg = state.messages[threadKey]?.[key];
+        if (!msg) return;
+        const myNum = state.currentUser.number;
+        const isGroup = threadKey.startsWith("group_");
+        const basePath = isGroup
+          ? `groupConvos/${threadKey.slice(6)}`
+          : `convos/${threadKey}`;
+        const isSaved = !!(msg.savedBy && msg.savedBy[myNum]);
+        if (isSaved) {
+          await remove(dbRef(db, `${basePath}/${key}/savedBy/${myNum}`));
+          showToast("message unsaved");
+        } else {
+          await set(dbRef(db, `${basePath}/${key}/savedBy/${myNum}`), true);
+          showToast("⭐ message saved");
+        }
+      };
+
+      // ── DISPLAY HELPERS ──
       function getContactDisplay(number) {
-        const contact = state.contacts[number];
-        if (contact) return contact.nickname || contact.name || number;
-        const user = state.usersByNumber[number];
-        if (user) return user.name || user.username || number;
+        const c = state.contacts[number];
+        if (c) return c.nickname || c.name || number;
+        const u = state.usersByNumber[number];
+        if (u) return u.name || u.username || number;
         return number;
       }
 
@@ -1479,15 +1759,7 @@
         return msg.text ? `${author}: ${msg.text}` : `${author}: message`;
       }
 
-      function threadPath(meta, key = null) {
-        if (!meta) return null;
-        if (meta.type === "dm")
-          return key ? `convos/${meta.key}/${key}` : `convos/${meta.key}`;
-        return key
-          ? `groupConvos/${meta.groupId}/${key}`
-          : `groupConvos/${meta.groupId}`;
-      }
-
+      // ── RENDER SIDEBAR ──
       function renderSidebar() {
         const el = $("sidebar-content");
         const active = state.activeTab;
@@ -1498,30 +1770,28 @@
           threads.sort(
             (a, b) => (b.lastMessage?.ts || 0) - (a.lastMessage?.ts || 0),
           );
-          if (!threads.length) {
-            el.innerHTML = `<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">No chats yet.<br>Messages will show up here.</div>`;
-          } else {
-            el.innerHTML = threads
-              .map(
-                (t) => `
-            <div class="chat-item ${state.activeThread?.key === t.key ? "active" : ""}" onclick="openThread('dm','${escapeAttr(t.key)}')">
-              <div class="avatar">${getInitials(t.peerName)}</div>
-              <div class="chat-info">
-                <div class="chat-name">${escapeHtml(t.peerName)}</div>
-                <div class="chat-sub">#${escapeHtml(t.peerNumber || "")}</div>
-                <div class="chat-preview">${escapeHtml(previewText(t.lastMessage) || "No messages yet")}</div>
-              </div>
-              ${t.unread ? `<div class="badge">${t.unread}</div>` : ""}
-            </div>`,
-              )
-              .join("");
-          }
+          el.innerHTML = threads.length
+            ? threads
+                .map(
+                  (t) => `
+              <div class="chat-item ${state.activeThread?.key === t.key ? "active" : ""}" onclick="openThread('dm','${escapeAttr(t.key)}')">
+                <div class="avatar">${getInitials(t.peerName)}</div>
+                <div class="chat-info">
+                  <div class="chat-name">${escapeHtml(t.peerName)}</div>
+                  <div class="chat-sub">#${escapeHtml(t.peerNumber || "")}</div>
+                  <div class="chat-preview">${escapeHtml(previewText(t.lastMessage) || "No messages yet")}</div>
+                </div>
+                ${t.unread ? `<div class="badge">${t.unread}</div>` : ""}
+              </div>`,
+                )
+                .join("")
+            : `<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">No chats yet.<br>Messages will show up here.</div>`;
           el.innerHTML += `<button class="action-btn" onclick="openAddContact()">+ Add Contact</button>`;
         }
 
         if (active === "groups") {
           Object.entries(state.groups).forEach(([gid, g]) => {
-            if (g?.members && g.members[state.currentUser.number]) {
+            if (g?.members && g.members[state.currentUser.number])
               threads.push(
                 getThreadMetaFromGroup(
                   gid,
@@ -1529,55 +1799,51 @@
                   state.messages[groupThreadKey(gid)] || {},
                 ),
               );
-            }
           });
           threads.sort(
             (a, b) => (b.lastMessage?.ts || 0) - (a.lastMessage?.ts || 0),
           );
-          if (!threads.length) {
-            el.innerHTML = `<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">No groups yet.<br>Create one to start a group chat.</div>`;
-          } else {
-            el.innerHTML = threads
-              .map(
-                (t) => `
-            <div class="chat-item ${state.activeThread?.key === t.key ? "active" : ""}" onclick="openThread('group','${escapeAttr(t.groupId)}')">
-              <div class="avatar">G</div>
-              <div class="chat-info">
-                <div class="chat-name">${escapeHtml(t.groupName)}</div>
-                <div class="chat-sub">${escapeHtml((t.members || []).length)} members</div>
-                <div class="chat-preview">${escapeHtml(previewText(t.lastMessage) || "No messages yet")}</div>
-              </div>
-              ${t.unread ? `<div class="badge">${t.unread}</div>` : ""}
-            </div>`,
-              )
-              .join("");
-          }
+          el.innerHTML = threads.length
+            ? threads
+                .map(
+                  (t) => `
+              <div class="chat-item ${state.activeThread?.key === t.key ? "active" : ""}" onclick="openThread('group','${escapeAttr(t.groupId)}')">
+                <div class="avatar">G</div>
+                <div class="chat-info">
+                  <div class="chat-name">${escapeHtml(t.groupName)}</div>
+                  <div class="chat-sub">${escapeHtml((t.members || []).length)} members</div>
+                  <div class="chat-preview">${escapeHtml(previewText(t.lastMessage) || "No messages yet")}</div>
+                </div>
+                ${t.unread ? `<div class="badge">${t.unread}</div>` : ""}
+              </div>`,
+                )
+                .join("")
+            : `<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">No groups yet.<br>Create one to start a group chat.</div>`;
           el.innerHTML += `<button class="action-btn" onclick="openGroupModal()">+ New Group</button>`;
         }
 
         if (active === "contacts") {
           const contactList = Object.values(state.contacts);
-          if (!contactList.length) {
-            el.innerHTML = `<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">No contacts yet.<br>Add someone to start texting.</div>`;
-          } else {
-            el.innerHTML = contactList
-              .map((c) => {
-                const displayName = c.nickname || c.name || c.number;
-                return `
-              <div class="chat-item" onclick="openThread('dm','${escapeAttr(convoId(state.currentUser.number, c.number))}')">
-                <div class="avatar">${getInitials(displayName)}</div>
-                <div class="chat-info">
-                  <div class="chat-name">${escapeHtml(displayName)}</div>
-                  <div class="chat-sub">#${escapeHtml(c.number)}</div>
-                </div>
-              </div>`;
-              })
-              .join("");
-          }
+          el.innerHTML = contactList.length
+            ? contactList
+                .map((c) => {
+                  const displayName = c.nickname || c.name || c.number;
+                  return `
+                <div class="chat-item" onclick="openThread('dm','${escapeAttr(convoId(state.currentUser.number, c.number))}')">
+                  <div class="avatar">${getInitials(displayName)}</div>
+                  <div class="chat-info">
+                    <div class="chat-name">${escapeHtml(displayName)}</div>
+                    <div class="chat-sub">#${escapeHtml(c.number)}</div>
+                  </div>
+                </div>`;
+                })
+                .join("")
+            : `<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">No contacts yet.<br>Add someone to start texting.</div>`;
           el.innerHTML += `<button class="action-btn" onclick="openAddContact()">+ Add Contact</button>`;
         }
       }
 
+      // ── RENDER THREAD HEADER ──
       function renderThreadHeader(meta) {
         const empty = $("empty-state");
         const chat = $("active-chat");
@@ -1586,10 +1852,8 @@
           chat.style.display = "none";
           return;
         }
-
         empty.style.display = "none";
         chat.style.display = "flex";
-
         if (meta.type === "dm") {
           $("chat-avatar").textContent = getInitials(meta.peerName);
           $("chat-contact-name").textContent = meta.peerName;
@@ -1601,16 +1865,21 @@
         }
       }
 
+      // ── RENDER MESSAGES (with auto-cleanup, lazy images, stars) ──
       function renderMessages(threadKey) {
         const el = $("chat-messages");
         const msgs = state.messages[threadKey] || {};
-        const sorted = Object.entries(msgs).sort(
-          (a, b) => (a[1].ts || 0) - (b[1].ts || 0),
-        );
-        let lastDate = "";
-        const isGroup = threadKey.startsWith("group_");
-        const groupId = isGroup ? threadKey.slice(6) : null;
 
+        // Clean up expired unsaved messages
+        cleanupExpiredMessages(threadKey, msgs);
+
+        const now = Date.now();
+        const isGroup = threadKey.startsWith("group_");
+        const sorted = Object.entries(msgs)
+          .filter(([, m]) => isMessageVisible(m))
+          .sort((a, b) => (a[1].ts || 0) - (b[1].ts || 0));
+
+        let lastDate = "";
         el.innerHTML = sorted
           .map(([key, m]) => {
             const out = m.from === state.currentUser.number;
@@ -1636,7 +1905,8 @@
             }
 
             if (m.type === "image" && m.imageUrl) {
-              contentHtml += `<img src="${escapeAttr(m.imageUrl)}" alt="sent image" class="image-message" onclick="openImageLightbox('${escapeAttr(m.imageUrl)}')">`;
+              // lazy-loaded image with skeleton
+              contentHtml += `<img src="${escapeAttr(m.imageUrl)}" alt="sent image" class="image-message loading" loading="lazy" onclick="openImageLightbox('${escapeAttr(m.imageUrl)}')" onload="this.classList.remove('loading')" onerror="this.classList.remove('loading')">`;
               if (m.caption)
                 contentHtml += `<div class="caption-spacer"></div><div class="message-text">${renderTextWithLinks(m.caption)}</div>`;
             } else if (m.text) {
@@ -1646,22 +1916,38 @@
             if (m.linkPreview?.url)
               contentHtml += renderLinkPreview(m.linkPreview);
 
+            const isSaved = !!(
+              m.savedBy && m.savedBy[state.currentUser.number]
+            );
+            const starBtn = `<button class="star-btn${isSaved ? " saved" : ""}" type="button" onclick="toggleStar('${escapeAttr(threadKey)}','${escapeAttr(key)}')" title="${isSaved ? "Unsave message" : "Save message"}">${isSaved ? "⭐" : "☆"}</button>`;
+
+            // For outgoing: star goes in message-actions; for incoming: appended after content
             const actions = out
-              ? `
-          <div class="message-actions">
-            <button class="message-action-btn" type="button" onclick="editMessage('${escapeAttr(threadKey)}','${escapeAttr(key)}')">Edit</button>
-            <button class="message-action-btn" type="button" onclick="deleteMessage('${escapeAttr(threadKey)}','${escapeAttr(key)}')">Delete</button>
-          </div>`
-              : "";
+              ? `<div class="message-actions">
+                ${starBtn}
+                <button class="message-action-btn" type="button" onclick="editMessage('${escapeAttr(threadKey)}','${escapeAttr(key)}')">Edit</button>
+                <button class="message-action-btn" type="button" onclick="deleteMessage('${escapeAttr(threadKey)}','${escapeAttr(key)}')">Delete</button>
+               </div>`
+              : `<div style="display:flex;justify-content:flex-end;margin-top:6px">${starBtn}</div>`;
+
+            // Show expiry countdown only when < 25 min left and not saved
+            const expiry = expiryLabel(m.expiresAt);
+            const expiryHtml =
+              expiry && !isSaved
+                ? `<div class="expiry-tag">${escapeHtml(expiry)}</div>`
+                : "";
 
             return `${divider}
-          <div class="msg-row ${out ? "outgoing" : "incoming"}" data-key="${escapeAttr(key)}">
-            <div class="bubble">
-              ${contentHtml || "&nbsp;"}
-              ${actions}
-            </div>
-            <div class="msg-time">${escapeHtml(timeStr(m.ts))}</div>
-          </div>`;
+            <div class="msg-row ${out ? "outgoing" : "incoming"}" data-key="${escapeAttr(key)}">
+              <div class="bubble">
+                ${contentHtml || "&nbsp;"}
+                ${actions}
+              </div>
+              <div>
+                <div class="msg-time">${escapeHtml(timeStr(m.ts))}</div>
+                ${expiryHtml}
+              </div>
+            </div>`;
           })
           .join("");
 
@@ -1691,18 +1977,17 @@
         const seen = state.seenKeys[threadKey] || new Set();
         const firstTime = !state.seenKeys[threadKey];
         state.seenKeys[threadKey] = seen;
-
         Object.entries(msgs || {}).forEach(([key, msg]) => {
           if (!seen.has(key)) {
-            const shouldNotify =
+            if (
+              !firstTime &&
               msg.from !== state.currentUser.number &&
-              (document.hidden || state.activeThread?.key !== threadKey);
-            if (!firstTime && shouldNotify) {
+              (document.hidden || state.activeThread?.key !== threadKey)
+            ) {
               const title = isGroup
-                ? `${state.groupMeta[threadKey]?.groupName || "Group"}`
-                : `${msg.fromName || getContactDisplay(msg.from)}`;
-              const body = previewText(msg);
-              notify(title, body);
+                ? state.groupMeta[threadKey]?.groupName || "Group"
+                : msg.fromName || getContactDisplay(msg.from);
+              notify(title, previewText(msg));
             }
             seen.add(key);
           }
@@ -1717,7 +2002,6 @@
             state.dmMeta[threadKey] = getThreadMetaFromDm(threadKey, msgs);
           }
         });
-
         state.groupMeta = {};
         Object.entries(state.groups).forEach(([gid, g]) => {
           if (g?.members && g.members[state.currentUser.number]) {
@@ -1747,12 +2031,11 @@
 
         onValue(dbRef(db, "users"), (snap) => {
           state.usersByNumber = {};
-          if (snap.exists()) {
+          if (snap.exists())
             Object.entries(snap.val()).forEach(([username, user]) => {
               if (user?.number)
                 state.usersByNumber[user.number] = { ...user, username };
             });
-          }
           syncMetaFromDb();
         });
 
@@ -1778,9 +2061,8 @@
           if (
             state.activeThread?.type === "dm" &&
             state.messages[state.activeThread.key]
-          ) {
+          )
             renderMessages(state.activeThread.key);
-          }
         });
 
         onValue(dbRef(db, "groupConvos"), (snap) => {
@@ -1798,9 +2080,8 @@
           if (
             state.activeThread?.type === "group" &&
             state.messages[state.activeThread.key]
-          ) {
+          )
             renderMessages(state.activeThread.key);
-          }
         });
       }
 
@@ -1828,24 +2109,22 @@
         renderSidebar();
       }
 
+      // ── AUTH ──
       window.registerUser = async function () {
         const username = $("reg-username").value.trim().toLowerCase();
         const name = $("reg-name").value.trim();
         const password = $("reg-password").value;
         const errEl = $("reg-error");
-
         if (!username || !name || !password)
           return (errEl.textContent = "All fields required.");
         if (username.length < 3)
           return (errEl.textContent = "Username must be 3+ characters.");
         if (password.length < 4)
           return (errEl.textContent = "Password must be 4+ characters.");
-
         errEl.textContent = "";
         const snap = await get(dbRef(db, `users/${username}`));
         if (snap.exists())
           return (errEl.textContent = "Username already taken.");
-
         const number = await assignNumber();
         const userData = {
           username,
@@ -1861,11 +2140,9 @@
         const username = $("login-username").value.trim().toLowerCase();
         const password = $("login-password").value;
         const errEl = $("login-error");
-
         if (!username || !password)
           return (errEl.textContent = "Enter username & password.");
         errEl.textContent = "";
-
         const snap = await get(dbRef(db, `users/${username}`));
         if (!snap.exists()) return (errEl.textContent = "User not found.");
         const data = snap.val();
@@ -1874,6 +2151,7 @@
         await loginSuccess(data);
       };
 
+      // ── TABS ──
       window.switchTab = function (tab) {
         state.activeTab = tab;
         $("tab-chats").classList.toggle("active", tab === "chats");
@@ -1882,6 +2160,7 @@
         renderSidebar();
       };
 
+      // ── CONTACTS ──
       window.openAddContact = function () {
         $("contact-number").value = "";
         $("contact-nickname").value = "";
@@ -1893,37 +2172,21 @@
         $("add-contact-modal").classList.remove("open");
       };
 
-      window.openGroupModal = function () {
-        $("group-name").value = "";
-        $("group-members").value = "";
-        $("group-error").textContent = "";
-        $("create-group-modal").classList.add("open");
-      };
-
-      window.closeGroupModal = function () {
-        $("create-group-modal").classList.remove("open");
-      };
-
       window.addContact = async function () {
         const num = $("contact-number").value.trim();
         const nick = $("contact-nickname").value.trim();
         const errEl = $("contact-error");
-
         if (num.length !== 4)
           return (errEl.textContent = "Enter a valid 4-digit number.");
         if (num === state.currentUser.number)
           return (errEl.textContent = "That's your own number!");
-
         const usersSnap = await get(dbRef(db, "users"));
         if (!usersSnap.exists()) return (errEl.textContent = "No users found.");
-
         let found = null;
         Object.entries(usersSnap.val()).forEach(([username, user]) => {
           if (user.number === num) found = { ...user, username };
         });
-
         if (!found) return (errEl.textContent = "No user with that number.");
-
         state.contacts[num] = {
           number: num,
           name: found.name,
@@ -1938,23 +2201,61 @@
         renderSidebar();
       };
 
+      // ── GROUPS (with contact picker) ──
+      window.openGroupModal = function () {
+        $("group-name").value = "";
+        $("group-members").value = "";
+        $("group-error").textContent = "";
+
+        // Populate contact checkboxes
+        const list = $("group-contact-list");
+        const contacts = Object.values(state.contacts);
+        if (contacts.length) {
+          list.innerHTML = contacts
+            .map((c) => {
+              const name = c.nickname || c.name || c.number;
+              return `<label class="contact-check-item">
+              <div class="check-avatar">${getInitials(name)}</div>
+              <div style="flex:1;min-width:0">
+                <div class="check-name">${escapeHtml(name)}</div>
+                <div class="check-num">#${escapeHtml(c.number)}</div>
+              </div>
+              <input type="checkbox" class="group-contact-check" value="${escapeAttr(c.number)}">
+            </label>`;
+            })
+            .join("");
+        } else {
+          list.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:8px">No contacts yet — enter numbers below.</div>`;
+        }
+
+        $("create-group-modal").classList.add("open");
+      };
+
+      window.closeGroupModal = function () {
+        $("create-group-modal").classList.remove("open");
+      };
+
       window.createGroup = async function () {
         const name = $("group-name").value.trim();
-        const membersRaw = $("group-members").value.trim();
         const err = $("group-error");
         if (!name) return (err.textContent = "Group name is required.");
 
-        const nums = [
-          ...new Set(
-            membersRaw
+        // Collect from checkboxes AND manual textarea
+        const checkedNums = [
+          ...document.querySelectorAll(".group-contact-check:checked"),
+        ].map((el) => el.value);
+        const manualRaw = $("group-members").value.trim();
+        const manualNums = manualRaw
+          ? manualRaw
               .split(/[\s,]+/)
               .map((s) => s.trim())
-              .filter(Boolean),
-          ),
-        ];
-        if (!nums.length)
-          return (err.textContent = "Add at least one member number.");
-        if (nums.includes(state.currentUser.number))
+              .filter(Boolean)
+          : [];
+        const allNums = [...new Set([...checkedNums, ...manualNums])];
+
+        if (!allNums.length)
+          return (err.textContent = "Select at least one member.");
+        if (allNums.includes(state.currentUser.number))
           return (err.textContent = "Your number is added automatically.");
 
         const usersSnap = await get(dbRef(db, "users"));
@@ -1962,7 +2263,7 @@
         const members = { [state.currentUser.number]: true };
         const invalid = [];
 
-        nums.forEach((num) => {
+        allNums.forEach((num) => {
           const match = Object.values(allUsers).find((u) => u.number === num);
           if (match) members[num] = true;
           else invalid.push(num);
@@ -1993,6 +2294,7 @@
         window.openThread("group", gid);
       };
 
+      // ── THREADS ──
       window.openThread = function (type, id) {
         if (type === "dm") {
           const msgs = state.messages[id] || {};
@@ -2020,6 +2322,7 @@
         }
       };
 
+      // ── IMAGE PICKER ──
       window.openImagePicker = function () {
         $("image-input").click();
       };
@@ -2028,7 +2331,7 @@
         const file = e.target.files && e.target.files[0];
         if (!file) return;
         if (!file.type.startsWith("image/"))
-          return showToast("please choose an image file.");
+          return showToast("Please choose an image file.");
         state.selectedImageFile = file;
         showAttachmentPreview(file);
       });
@@ -2037,16 +2340,7 @@
         clearAttachment();
       };
 
-      async function uploadSelectedImage() {
-        if (!state.selectedImageFile) return null;
-        return await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(state.selectedImageFile);
-        });
-      }
-
+      // ── SEND MESSAGE ──
       window.sendMessage = async function () {
         const input = $("message-input");
         const text = input.value.trim();
@@ -2054,45 +2348,56 @@
         if (!meta) return;
         if (!text && !state.selectedImageFile) return;
 
-        let linkPreview = null;
-        const firstUrl = extractFirstUrl(text);
-        if (firstUrl) linkPreview = await fetchLinkPreview(firstUrl);
+        const sendBtn = document.querySelector(".send-btn");
+        sendBtn.disabled = true;
 
-        let imageUrl = null;
-        if (state.selectedImageFile) {
-          try {
-            imageUrl = await uploadSelectedImage();
-          } catch {
-            return showToast("image upload failed.");
+        try {
+          let linkPreview = null;
+          const firstUrl = extractFirstUrl(text);
+          if (firstUrl) linkPreview = await fetchLinkPreview(firstUrl);
+
+          let imageUrl = null;
+          if (state.selectedImageFile) {
+            try {
+              imageUrl = await uploadImageToStorage(state.selectedImageFile);
+            } catch {
+              showToast("image upload failed — check Storage rules.");
+              sendBtn.disabled = false;
+              return;
+            }
           }
-        }
 
-        const msg = {
-          from: state.currentUser.number,
-          fromName: state.currentUser.name,
-          ts: Date.now(),
-          read: false,
-        };
-        if (imageUrl) {
-          msg.type = "image";
-          msg.imageUrl = imageUrl;
-          if (text) msg.caption = text;
-          if (linkPreview) msg.linkPreview = linkPreview;
-        } else {
-          msg.type = "text";
-          msg.text = text;
-          if (linkPreview) msg.linkPreview = linkPreview;
-        }
+          const msg = {
+            from: state.currentUser.number,
+            fromName: state.currentUser.name,
+            ts: Date.now(),
+            expiresAt: Date.now() + MSG_TTL, // ← auto-expire in 30 min
+            read: false,
+          };
 
-        if (meta.type === "dm") {
-          await push(dbRef(db, `convos/${meta.key}`), msg);
-        } else {
-          await push(dbRef(db, `groupConvos/${meta.groupId}`), msg);
-        }
+          if (imageUrl) {
+            msg.type = "image";
+            msg.imageUrl = imageUrl;
+            if (text) msg.caption = text;
+            if (linkPreview) msg.linkPreview = linkPreview;
+          } else {
+            msg.type = "text";
+            msg.text = text;
+            if (linkPreview) msg.linkPreview = linkPreview;
+          }
 
-        input.value = "";
-        input.style.height = "auto";
-        clearAttachment();
+          if (meta.type === "dm") {
+            await push(dbRef(db, `convos/${meta.key}`), msg);
+          } else {
+            await push(dbRef(db, `groupConvos/${meta.groupId}`), msg);
+          }
+
+          input.value = "";
+          input.style.height = "auto";
+          clearAttachment();
+        } finally {
+          sendBtn.disabled = false;
+        }
       };
 
       window.handleKey = function (e) {
@@ -2107,10 +2412,10 @@
         el.style.height = Math.min(el.scrollHeight, 120) + "px";
       };
 
+      // ── EDIT / DELETE ──
       window.editMessage = function (threadKey, key) {
         const msg = state.messages[threadKey]?.[key];
         if (!msg || msg.from !== state.currentUser.number) return;
-
         state.editing = {
           key,
           path: threadKey.startsWith("group_")
@@ -2118,7 +2423,6 @@
             : `convos/${threadKey}`,
           data: { ...msg },
         };
-
         $("edit-message-error").textContent = "";
         $("edit-message-text").value =
           msg.type === "image" ? msg.caption || "" : msg.text || "";
@@ -2137,7 +2441,6 @@
         const nextText = $("edit-message-text").value.trim();
         if (!state.editing.key || !state.editing.path || !state.editing.data)
           return (err.textContent = "No message selected.");
-
         const base = { ...state.editing.data };
         if (base.type === "image") {
           if (nextText) base.caption = nextText;
@@ -2153,7 +2456,6 @@
           if (firstUrl) base.linkPreview = await fetchLinkPreview(firstUrl);
           else delete base.linkPreview;
         }
-
         await set(
           dbRef(db, `${state.editing.path}/${state.editing.key}`),
           base,
@@ -2174,37 +2476,34 @@
           .catch(() => showToast("delete failed"));
       };
 
+      // ── LIGHTBOX ──
       window.openImageLightbox = function (src) {
         $("lightbox-image").src = src;
         $("image-modal").classList.add("open");
       };
-
       window.closeImageLightbox = function () {
         $("image-modal").classList.remove("open");
         $("lightbox-image").src = "";
       };
 
+      // ── DELETE ACCOUNT ──
       window.openDeleteAccountModal = function () {
         $("delete-account-confirm").value = "";
         $("delete-account-password").value = "";
         $("delete-account-error").textContent = "";
         $("delete-account-modal").classList.add("open");
       };
-
       window.closeDeleteAccountModal = function () {
         $("delete-account-modal").classList.remove("open");
-        $("delete-account-error").textContent = "";
       };
 
       window.deleteAccount = async function () {
         const confirmText = $("delete-account-confirm").value.trim();
         const password = $("delete-account-password").value;
         const err = $("delete-account-error");
-
         if (confirmText !== "DELETE")
           return (err.textContent = "Type DELETE exactly to confirm.");
         if (!password) return (err.textContent = "Enter your password.");
-
         const userSnap = await get(
           dbRef(db, `users/${state.currentUser.username}`),
         );
@@ -2212,30 +2511,29 @@
         const userData = userSnap.val();
         if (userData.passwordHash !== hashPassword(password))
           return (err.textContent = "Wrong password.");
-
         await remove(dbRef(db, `contacts/${state.currentUser.username}`));
         await remove(dbRef(db, `users/${state.currentUser.username}`));
-
         const groupsSnap = await get(dbRef(db, "groups"));
         if (groupsSnap.exists()) {
           const updates = {};
           Object.entries(groupsSnap.val()).forEach(([gid, g]) => {
-            if (g?.members?.[state.currentUser.number]) {
+            if (g?.members?.[state.currentUser.number])
               updates[`groups/${gid}/members/${state.currentUser.number}`] =
                 null;
-            }
           });
           if (Object.keys(updates).length) await update(dbRef(db), updates);
         }
-
         localStorage.removeItem("pt_user");
-        state.currentUser = null;
-        state.contacts = {};
-        state.groups = {};
-        state.messages = {};
-        state.dmMeta = {};
-        state.groupMeta = {};
-        state.activeThread = null;
+        Object.assign(state, {
+          currentUser: null,
+          contacts: {},
+          groups: {},
+          messages: {},
+          dmMeta: {},
+          groupMeta: {},
+          activeThread: null,
+          listenersStarted: false,
+        });
         closeDeleteAccountModal();
         $("app-screen").classList.remove("active");
         $("auth-screen").classList.add("active");
@@ -2244,30 +2542,31 @@
         showToast("account deleted");
       };
 
+      // ── AUTH SWITCH ──
       window.showRegister = function () {
         $("login-card").style.display = "none";
         $("register-card").style.display = "block";
       };
-
       window.showLogin = function () {
         $("register-card").style.display = "none";
         $("login-card").style.display = "block";
       };
 
+      // ── MODAL CLICK-OUTSIDE ──
       document.addEventListener("click", (e) => {
-        const ids = [
+        [
           "add-contact-modal",
           "create-group-modal",
           "edit-message-modal",
           "delete-account-modal",
           "image-modal",
-        ];
-        ids.forEach((id) => {
+        ].forEach((id) => {
           if (e.target === $(id)) $(id).classList.remove("open");
         });
         if (e.target === $("image-modal")) closeImageLightbox();
       });
 
+      // ── AUTO-LOGIN ──
       const saved = localStorage.getItem("pt_user");
       if (saved) {
         try {
