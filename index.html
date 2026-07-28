@@ -76,11 +76,19 @@
       .grid-bg {
         position: absolute;
         inset: 0;
+        z-index: 0;
         background-image:
           linear-gradient(var(--border) 1px, transparent 1px),
           linear-gradient(90deg, var(--border) 1px, transparent 1px);
         background-size: 40px 40px;
-        opacity: 0.28;
+        opacity: 0.16;
+      }
+      #dot-canvas {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        display: block;
       }
       .auth-card,
       .modal {
@@ -95,6 +103,7 @@
       }
       .auth-card {
         position: relative;
+        z-index: 2;
         padding: 40px;
         width: 360px;
         max-width: 90vw;
@@ -287,7 +296,7 @@
         border-color: var(--accent);
       }
 
-      /* ── NEW: Logout button ── */
+      /* ── Logout button ── */
       .logout-btn {
         display: flex;
         align-items: center;
@@ -1052,6 +1061,7 @@
     <!-- AUTH SCREEN -->
     <div id="auth-screen" class="screen active">
       <div class="grid-bg"></div>
+      <canvas id="dot-canvas"></canvas>
       <div class="auth-card" id="login-card">
         <div class="logo">
           <div class="logo-icon">💬</div>
@@ -1434,6 +1444,177 @@
       }
     </script>
 
+    <!-- ── ANIMATED DOT-REPULSION BACKGROUND (login screen) ── -->
+    <script>
+      (function () {
+        // Vanilla-JS port of the "Mouse Effect Card" dot field:
+        // a grid of dots, denser toward the center, that gently pulse
+        // in opacity and get pushed away from the cursor.
+        class DotField {
+          constructor(canvas) {
+            this.canvas = canvas;
+            this.ctx = canvas.getContext("2d");
+            this.container = canvas.parentElement;
+            this.dots = [];
+            this.mouse = { x: -9999, y: -9999 };
+            this.spacing = 26; // distance between dots
+            this.dotSize = 1.6; // dot radius (px)
+            this.repulsionRadius = 100; // how close before dots react
+            this.repulsionStrength = 24; // how far dots get pushed
+            this.easing = 0.16; // spring-ish smoothing toward target
+            this.raf = null;
+            this.width = 0;
+            this.height = 0;
+
+            this.resize = this.resize.bind(this);
+            this.onMove = this.onMove.bind(this);
+            this.onLeave = this.onLeave.bind(this);
+            this.loop = this.loop.bind(this);
+
+            window.addEventListener("resize", this.resize);
+            this.container.addEventListener("mousemove", this.onMove);
+            this.container.addEventListener("mouseleave", this.onLeave);
+            this.container.addEventListener(
+              "touchmove",
+              (e) => {
+                const t = e.touches && e.touches[0];
+                if (t) this.onMove(t);
+              },
+              { passive: true },
+            );
+            this.container.addEventListener("touchend", this.onLeave);
+
+            this.resize();
+            this.loop();
+          }
+
+          resize() {
+            const rect = this.container.getBoundingClientRect();
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            this.width = rect.width;
+            this.height = rect.height;
+            this.canvas.width = Math.max(1, Math.round(rect.width * dpr));
+            this.canvas.height = Math.max(1, Math.round(rect.height * dpr));
+            this.canvas.style.width = rect.width + "px";
+            this.canvas.style.height = rect.height + "px";
+            this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            this.generateDots();
+          }
+
+          generateDots() {
+            const dots = [];
+            const cols = Math.ceil(this.width / this.spacing);
+            const rows = Math.ceil(this.height / this.spacing);
+            const cx = this.width / 2;
+            const cy = this.height / 2;
+            const maxDistance = Math.sqrt(cx * cx + cy * cy) || 1;
+
+            for (let row = 0; row <= rows; row++) {
+              for (let col = 0; col <= cols; col++) {
+                const x = col * this.spacing;
+                const y = row * this.spacing;
+                const dx = x - cx;
+                const dy = y - cy;
+                const distFromCenter = Math.sqrt(dx * dx + dy * dy);
+                const edgeFactor = Math.min(
+                  distFromCenter / (maxDistance * 0.72),
+                  1,
+                );
+
+                // denser near the center, thinning out toward the edges
+                if (Math.random() > 1 - edgeFactor * 0.85) continue;
+
+                const pattern = (row + col) % 3;
+                const baseOpacities = [0.22, 0.38, 0.52];
+                const opacity =
+                  baseOpacities[pattern] * (1 - edgeFactor * 0.7);
+
+                dots.push({
+                  baseX: x,
+                  baseY: y,
+                  x,
+                  y,
+                  opacity,
+                  phase: Math.random() * Math.PI * 2,
+                  speed: 0.55 + Math.random() * 0.5,
+                });
+              }
+            }
+            this.dots = dots;
+          }
+
+          onMove(e) {
+            const rect = this.canvas.getBoundingClientRect();
+            this.mouse.x = e.clientX - rect.left;
+            this.mouse.y = e.clientY - rect.top;
+          }
+
+          onLeave() {
+            this.mouse.x = -9999;
+            this.mouse.y = -9999;
+          }
+
+          loop(t) {
+            this.raf = requestAnimationFrame(this.loop);
+            const ctx = this.ctx;
+            ctx.clearRect(0, 0, this.width, this.height);
+            const time = (t || 0) / 1000;
+
+            for (let i = 0; i < this.dots.length; i++) {
+              const d = this.dots[i];
+              const dx = d.baseX - this.mouse.x;
+              const dy = d.baseY - this.mouse.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+
+              let targetX = d.baseX;
+              let targetY = d.baseY;
+              let boost = 0;
+
+              if (dist < this.repulsionRadius) {
+                const force =
+                  (1 - dist / this.repulsionRadius) * this.repulsionStrength;
+                const angle = Math.atan2(dy, dx);
+                targetX = d.baseX + Math.cos(angle) * force;
+                targetY = d.baseY + Math.sin(angle) * force;
+                boost = (1 - dist / this.repulsionRadius) * 0.55;
+              }
+
+              d.x += (targetX - d.x) * this.easing;
+              d.y += (targetY - d.y) * this.easing;
+
+              const pulse = (Math.sin(time * d.speed + d.phase) + 1) / 2;
+              const minOp = Math.max(d.opacity * 0.5, 0.1);
+              const maxOp = Math.min(d.opacity * 1.5, 1);
+              let alpha = minOp + (maxOp - minOp) * pulse + boost;
+              if (alpha > 1) alpha = 1;
+
+              ctx.beginPath();
+              ctx.arc(d.x, d.y, this.dotSize, 0, Math.PI * 2);
+              ctx.fillStyle = "rgba(124, 201, 255, " + alpha.toFixed(3) + ")";
+              ctx.fill();
+            }
+          }
+
+          destroy() {
+            cancelAnimationFrame(this.raf);
+            window.removeEventListener("resize", this.resize);
+          }
+        }
+
+        function initDotField() {
+          const canvas = document.getElementById("dot-canvas");
+          if (!canvas) return;
+          window.__pocketTextDotField = new DotField(canvas);
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initDotField);
+        } else {
+          initDotField();
+        }
+      })();
+    </script>
+
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
       import {
@@ -1453,7 +1634,7 @@
         getDownloadURL,
       } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-      // ── NEW: Firebase Auth imports ──
+      // ── Firebase Auth imports ──
       import {
         getAuth,
         createUserWithEmailAndPassword,
